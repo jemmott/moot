@@ -5,12 +5,19 @@ This repository has the code for the MOOT (Matter Out Of Time), a.k.a. "the time
 
 The basic steps are:
 
-- Read the audio input stream, which will be a theremin
-- Estimate the dominant frequency
-- Map that frequency to LED lighting effects (low tone -> red, high tone -> blue)
-- Use the frequency to control VLC playback (low tone -> backwards in time, hight tone -> fast forward in time)
+1. Read the audio input stream, which will be a theremin
+2. Estimate the dominant frequency (with moving average)
+3. Map that audio frequency to LED lighting effects (low tone -> red, high tone -> blue)
+4. Use the audio frequency to control VLC playback (low tone -> backwards in time, hight tone -> fast forward in time)
+
+The first two steps are done.
 
 This will run on a Raspberry Pi.
+
+There are also some side / debug programs:
+
+- Show a QR code to the MOOT website with color changing based on audio
+- Name the colors in real-time for debugging
 
 ## Notes
 
