@@ -1,40 +1,34 @@
-import numpy as np
-from audio_input import init_audio, find_freq, freq_to_color
-from display_qr import run_display
-from color_names import print_results
-
-## To do:
-# control VLC
-# Control LED strip
+from audio_input import audio_processor
+from video_output import video_display
+from color_output import color_display
+import queue
+import threading
 
 
-# Set audio stream parameters
-RATE = 44100  # samples per second
-CHUNK = 4096  # number of samples per frame
 
 def main():
-    stream = init_audio(RATE, CHUNK)
+    speed_queue = queue.Queue(maxsize=10)
+    color_queue = queue.Queue(maxsize=10)
 
-    print("Reading audio stream...")
-    while True:
-        # Read audio stream
-        data = np.frombuffer(stream.read(CHUNK, exception_on_overflow=False), dtype=np.int16)
-        # Find the dominant frequency with smoothing
-        freq = find_freq(data, RATE, CHUNK)
-        # Translate audio frequency to color
-        color = freq_to_color(freq)
-        # Display color shifting QR code
-        run_display(color)
+    # Start threads
+    video_thread = threading.Thread(target=video_display, args=(speed_queue,))
+    color_thread = threading.Thread(target=color_display, args=(color_queue,))
+    audio_thread = threading.Thread(
+        target=audio_processor,
+        args=(
+            speed_queue,
+            color_queue,
+        ),
+    )
 
-        print_results(freq, color)
+    video_thread.start()
+    color_thread.start()
+    audio_thread.start()
+
+    video_thread.join()
+    color_thread.join()
+    audio_thread.join()
 
 
-    stream.stop_stream()
-    stream.close()
-    p.terminate()
-
-
-
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
