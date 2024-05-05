@@ -2,7 +2,7 @@ import webcolors
 
 
 def closest_color(requested_color):
-    '''This is a totally silly function to return color names based on rgb values'''
+    """This is a totally silly function to return color names based on rgb values"""
     min_colors = {}
     for key, name in webcolors.CSS3_HEX_TO_NAMES.items():
         r_c, g_c, b_c = webcolors.hex_to_rgb(key)

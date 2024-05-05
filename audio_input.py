@@ -2,18 +2,16 @@ import pyaudio
 import numpy as np
 from scipy.signal import find_peaks
 from collections import deque
-from color_names import closest_color
 
 
 # Set audio stream parameters
-RATE = 44100  # samples per second
-CHUNK = 4096  # number of samples per frame
 window_size = 5  # Number of past frequencies to consider
 freq_window = deque(maxlen=window_size)
+RATE = 44100  # samples per second
+CHUNK = 4096  # number of samples per frame
 
 
-def audio_processor(speed_queue, color_queue):
-    stream = init_audio(RATE, CHUNK)
+def audio_processor(stream, frequency_queue):
     while True:
         # Read audio stream
         data = np.frombuffer(
@@ -21,27 +19,18 @@ def audio_processor(speed_queue, color_queue):
         )
         # Find the dominant frequency with smoothing
         freq = find_freq(data, RATE, CHUNK)
-        # Translate audio frequency to color, speed
+        # Translate audio frequency to color (r,g,b), speed
         color = freq_to_color(freq)
         playback_speed = freq_to_speed(freq)
 
-        print(f"Frequency: {freq:.1f} Hz, Color: {closest_color(color)}, Speed: {playback_speed:.1f}x")
+        # make sure the queue is empty before adding new values
+        while not frequency_queue.empty():
+            frequency_queue.get_nowait()
 
-        add_to_queue(speed_queue, playback_speed)
-        add_to_queue(color_queue, color)
-
-
-def add_to_queue(q, value):
-    # Ensure only the latest data is in the queue
-    while q.full():
-        try:
-            q.get_nowait()  # Try to empty the queue quickly
-        except queue.Empty:
-            pass  # If the queue is already empty, do nothing
-    q.put(value)
+        frequency_queue.put(freq)
 
 
-def init_audio(rate, chunk):
+def init_audio(rate=RATE, chunk=CHUNK):
     # Initialize PyAudio
     p = pyaudio.PyAudio()
 
@@ -103,7 +92,7 @@ def freq_to_color(freq):
 def freq_to_speed(freq):
     norm_freq = normalize_frequency(freq)
 
-    color = 5 * norm_freq - 5  # This needs some tuning
+    color = 125 * norm_freq - 50  # This needs some tuning
     return color
 
 
