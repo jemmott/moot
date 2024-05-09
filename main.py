@@ -9,6 +9,9 @@ import cv2
 def main():
     # Load video
     cap = cv2.VideoCapture("MOOT.mov")
+    if not cap.isOpened():
+        print("Error: Could not open video.")
+        return
     fps = cap.get(cv2.CAP_PROP_FPS)  # Get the frames per second of the video
     frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     delay = int(1000 / fps)  # Calculate delay for each frame in milliseconds
