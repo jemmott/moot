@@ -2,9 +2,7 @@ import cv2
 import time
 
 
-# To Do: Loop not underflowing in reverse
-
-def display_frame(cap, playback_speed, frame_count, delay):
+def display_frame(cap, playback_speed, frame_count, delay, resize=True):
 
     current_frame = int(cap.get(cv2.CAP_PROP_POS_FRAMES))
 
@@ -24,9 +22,33 @@ def display_frame(cap, playback_speed, frame_count, delay):
         cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
         return "continue"
 
+    if resize:  # Trim the frame to widescreen
+        frame = trim_widescreen(frame)
+
     # Display the frame
     cv2.imshow("Video", frame)
     if cv2.waitKey(delay) & 0xFF == ord("q"):  # Wait based on the video's fps
         return "break"
 
     return "ok"
+
+
+def trim_widescreen(frame):
+    # Get dimensions of the original frame
+    height, width = frame.shape[:2]
+
+    # New dimensions targeting 16:9 aspect ratio
+    new_width = width
+    new_height = int(new_width * 9 / 16)
+
+    # Calculate cropping (assuming black bars are at the top and bottom)
+    start_row = int((height - new_height) / 2)
+    end_row = start_row + new_height
+
+    # Crop the frame to the new dimensions
+    cropped_frame = frame[start_row:end_row, :]
+
+    # Resize to fill the screen if necessary (can adjust the dimensions as needed)
+    resized_frame = cv2.resize(cropped_frame, (new_width, new_height))
+
+    return resized_frame

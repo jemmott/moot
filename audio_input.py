@@ -9,7 +9,10 @@ window_size = 5  # Number of past frequencies to consider
 freq_window = deque(maxlen=window_size)
 RATE = 44100  # samples per second
 CHUNK = 4096  # number of samples per frame
-audio_threshold = 100  # if mean absolute value is less than this, don't estimate frequency
+audio_threshold = (
+    100  # if mean absolute value is less than this, don't estimate frequency
+)
+
 
 def audio_processor(stream, frequency_queue):
     while True:

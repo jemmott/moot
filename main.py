@@ -8,6 +8,7 @@ import cv2
 fullscreen = False
 use_playback_delay = False
 
+
 def main():
     # Load video
     cap = cv2.VideoCapture("MOOT.mov")
