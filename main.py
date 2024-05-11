@@ -5,6 +5,8 @@ import queue
 import threading
 import cv2
 
+fullscreen = False
+use_playback_delay = False
 
 def main():
     # Load video
@@ -12,9 +14,13 @@ def main():
     if not cap.isOpened():
         print("Error: Could not open video.")
         return
-    fps = cap.get(cv2.CAP_PROP_FPS)  # Get the frames per second of the video
     frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-    delay = int(1000 / fps)  # Calculate delay for each frame in milliseconds
+
+    if use_playback_delay:
+        delay = 1  # play as fast as possible
+    else:
+        fps = cap.get(cv2.CAP_PROP_FPS)  # Get the frames per second of the video
+        delay = int(1000 / fps)  # Calculate delay for each frame in milliseconds
 
     # set up audio stream and queue
     stream = init_audio()
@@ -27,6 +33,10 @@ def main():
     frequency = 100
     color = (0, 0, 0)
     playback_speed = 1
+
+    if fullscreen:
+        cv2.namedWindow("Video", cv2.WND_PROP_FULLSCREEN)
+        cv2.setWindowProperty("Video", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 
     while True:
         # Get new frequency if it exists

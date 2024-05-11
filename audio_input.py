@@ -9,7 +9,7 @@ window_size = 5  # Number of past frequencies to consider
 freq_window = deque(maxlen=window_size)
 RATE = 44100  # samples per second
 CHUNK = 4096  # number of samples per frame
-
+audio_threshold = 100  # if mean absolute value is less than this, don't estimate frequency
 
 def audio_processor(stream, frequency_queue):
     while True:
@@ -19,9 +19,6 @@ def audio_processor(stream, frequency_queue):
         )
         # Find the dominant frequency with smoothing
         freq = find_freq(data, RATE, CHUNK)
-        # Translate audio frequency to color (r,g,b), speed
-        color = freq_to_color(freq)
-        playback_speed = freq_to_speed(freq)
 
         # make sure the queue is empty before adding new values
         while not frequency_queue.empty():
@@ -60,6 +57,9 @@ def list_audio_devices(p):
 
 
 def find_freq(audio_chunk, rate, chunk):
+    if np.mean(np.abs(audio_chunk)) < audio_threshold:
+        return -1
+
     # Perform FFT
     fft_data = np.fft.fft(audio_chunk)
     fft_data = np.abs(
@@ -83,6 +83,9 @@ def find_freq(audio_chunk, rate, chunk):
 
 
 def freq_to_color(freq):
+    if freq == -1:
+        return (0, 0, 0)  # black
+
     norm_freq = normalize_frequency(freq)
 
     color = (int((1 - norm_freq) * 255), 0, int(norm_freq * 255))
@@ -90,14 +93,17 @@ def freq_to_color(freq):
 
 
 def freq_to_speed(freq):
+    if freq == -1:
+        return 1  # default speed
+
     norm_freq = normalize_frequency(freq)
 
-    color = 125 * norm_freq - 50  # This needs some tuning
-    return color
+    speed = 125 * norm_freq - 50  # This needs some tuning
+    return speed
 
 
-def normalize_frequency(freq, f_min=50):
-    f_max = f_min * (2**7)  # 7 octaves higher
+def normalize_frequency(freq, f_min=100):
+    f_max = f_min * (2**5)  # 5 octaves higher
     log_f_min = np.log(f_min)
     log_f_max = np.log(f_max)
 
