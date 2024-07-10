@@ -16,8 +16,10 @@
     {
       devShells.default = nixpkgs.mkShell {
         packages = [
+          nixpkgs-unstable.portaudio
           nixpkgs-unstable.python311
           nixpkgs-unstable.python311Packages.python
+          nixpkgs-unstable.zlib
         ];
         shellHook = ''
           if [ ! -d .venv ]; then
