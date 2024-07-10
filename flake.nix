@@ -18,17 +18,14 @@
         packages = [
           nixpkgs-unstable.portaudio
           nixpkgs-unstable.python311
-          nixpkgs-unstable.python311Packages.python
+          nixpkgs-unstable.python311Packages.numpy
+          nixpkgs-unstable.python311Packages.scipy
+          nixpkgs-unstable.python311Packages.opencv4
+          nixpkgs-unstable.python311Packages.webcolors
+          nixpkgs-unstable.python311Packages.pyaudio
           nixpkgs-unstable.zlib
         ];
         shellHook = ''
-          if [ ! -d .venv ]; then
-            python -m venv .venv
-            source .venv/bin/activate
-            pip install -r tfbuild
-          else
-            source .venv/bin/activate
-          fi
           python3 --version
         '';
       };
