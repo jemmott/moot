@@ -37,6 +37,11 @@ Pip also failed on the Raspberry Pi for pygame, numpy, and others that need prec
 
 `sudo apt-get install python3-<packagename>`
 
+### nix/nixos
+When using nix, all of the required packages are defined in flake.nix.  To get the development environment going, run `nix develop`.
+
+If using nixos, make sure the following option is enabled. `hardware.pulseaudio.enable = true;`
+
 ## Development notes
 
 I tried a version that put opencv in a thread, and it really doesn't like that.
