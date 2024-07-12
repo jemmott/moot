@@ -16,14 +16,12 @@
     {
       devShells.default = nixpkgs.mkShell {
         packages = [
-          nixpkgs-unstable.portaudio
           nixpkgs-unstable.python311
           nixpkgs-unstable.python311Packages.numpy
           nixpkgs-unstable.python311Packages.scipy
           nixpkgs-unstable.python311Packages.opencv4
           nixpkgs-unstable.python311Packages.webcolors
           nixpkgs-unstable.python311Packages.pyaudio
-          nixpkgs-unstable.zlib
         ];
         shellHook = ''
           python3 --version
