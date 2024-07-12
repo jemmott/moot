@@ -19,7 +19,9 @@
           nixpkgs-unstable.python311
           nixpkgs-unstable.python311Packages.numpy
           nixpkgs-unstable.python311Packages.scipy
-          nixpkgs-unstable.python311Packages.opencv4
+          (nixpkgs-unstable.python311Packages.opencv4.override {
+            enableGtk2 = true;
+          })
           nixpkgs-unstable.python311Packages.webcolors
           nixpkgs-unstable.python311Packages.pyaudio
         ];
