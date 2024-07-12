@@ -1,5 +1,5 @@
 {
-  description = "123";
+  description = "moot flake";
 
   inputs = {
     flake-utils.url = "github:numtide/flake-utils";
