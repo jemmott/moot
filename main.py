@@ -5,7 +5,7 @@ import queue
 import threading
 import cv2
 
-fullscreen = False
+fullscreen = True
 use_playback_delay = False
 
 
