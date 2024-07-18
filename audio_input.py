@@ -10,7 +10,8 @@ freq_window = deque(maxlen=window_size)
 RATE = 44100  # samples per second
 CHUNK = 4096  # number of samples per frame
 audio_threshold = (
-    100  # if mean absolute value is less than this, don't estimate frequency
+    1000  # if mean absolute value is less than this, don't estimate frequency
+    # Value was 100, but was gettint too much 60 Hz on generator, so 1,000
 )
 
 
@@ -101,7 +102,7 @@ def freq_to_speed(freq):
 
     norm_freq = normalize_frequency(freq)
 
-    speed = 125 * norm_freq - 50  # This needs some tuning
+    speed = 50 * norm_freq - 20  # This needs some tuning, last 125, -50
     return speed
 
 
