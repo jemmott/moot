@@ -1,0 +1,51 @@
+var speed = 0.6;
+var pixelsBeforeAfter = 1; // Reduced for slower, more controlled movement
+var offDurationRandomVar = 200;
+var accumMs = 0;
+var blinkDuration = 500; // Duration of the lightning effect
+var offDuration = 0; // Duration of the off time
+var hue = 0; // White color
+var pixel;
+var twinkling = false;
+var pixelCount = 10; // Define the length of the LED strip
+
+function next() {
+  hue = 0; // White color
+  pixel = floor(random(pixelCount - 2 * pixelsBeforeAfter) + pixelsBeforeAfter); // Randomly select a pixel index within the range
+  blinkDuration = 500; // Duration of the lightning effect in ms
+  offDuration = (500 + random(2500)); // Off duration between 0.5 and 3 seconds
+  accumMs = 0; // Reset the animation timer
+}
+
+function lerp(a, b, t) {
+  return a + (b - a) * t;
+}
+
+export function beforeRender(delta) {
+  accumMs += delta;
+
+  v = triangle(accumMs / blinkDuration); // Fade in and out, 0->1->0
+
+  if (random(pixelCount) < 1 / delta) twinkling = !twinkling; // Chaotic flip-flop 0/1
+  if (v > 0.6) v -= twinkling * 0.5; // If in the top 40% of intensities, twinkle
+  v *= v; // Typical gamma-correction
+
+  if (accumMs > blinkDuration) v = 0; // Dark for offDuration
+  if (accumMs > blinkDuration + offDuration) next(); // Zero's accumMs
+}
+
+export function render(index) {
+  var isInRange = index >= pixel - pixelsBeforeAfter && index <= pixel + pixelsBeforeAfter;
+
+  // Set color based on whether the index is in the range of pixels before and after
+  if (isInRange) {
+    // Calculate the distance from the center pixel
+    var distance = abs(index - pixel);
+    // Interpolate v between consecutive pixels
+    var interpolatedV = lerp(0, v, 1 - distance / pixelsBeforeAfter);
+
+    hsv(hue, 0, interpolatedV * 2); // White color, saturation 0
+  } else {
+    hsv(0, 0, 0); // All other pixels off
+  }
+}
