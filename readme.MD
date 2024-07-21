@@ -21,6 +21,17 @@ This uses Python 3, and you'll need to install the libraries in requirements.txt
 
 To run just get into the directory in the console and run `python main.py`
 
+To make a PR I had to use `sudo apt install gh` to auth.
+
+Also best to make a virtual environment.  On the pi:
+
+```
+cd ~
+python3 -m venv moot
+nano ~/.bashrc
+```
+Add `source ~/moot/bin/activate` and restart.
+
 ### pyaudio
 
 I had trouble using pip to install pyaudio on the mac.  The solution was [here](https://stackoverflow.com/questions/31236194/installing-pyaudio-for-python-3-on-os-x), including having to install the command line tools for Xcode.
@@ -33,9 +44,11 @@ I get weird errors with one USB sound card on the Pi, but the other one works.
 
 ### Raspberry Pi
 
-Pip also failed on the Raspberry Pi for pygame, numpy, and others that need precompiled wheels.  The solution was to build the wheel locally.
+<s>Pip also failed on the Raspberry Pi for pygame, numpy, and others that need precompiled wheels.  The solution was to build the wheel locally.
 
-`sudo apt-get install python3-<packagename>`
+`sudo apt-get install python3-<packagename>`</s> This was solved with venv.
+
+I had to enable I2C Interface on Raspberry Pi, which is disabled by default: Start > Preferences > Raspberry Pi Configuration > Interfaces tab > I2C > Enabled
 
 ### nix/nixos
 When using nix, all of the required packages are defined in flake.nix.  To get the developing enable nix flakes and run `nix develop`.
