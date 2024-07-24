@@ -1,9 +1,13 @@
-from audio_input import init_audio, audio_processor, freq_to_speed, freq_to_color
+from audio_input import freq_to_speed
 from video_output import display_frame
 from color_names import closest_color
+from distance import map_distance_to_frequency, generate_sine_wave
+import board
+import adafruit_vl53l1x
 import queue
 import threading
 import cv2
+import pixelblaze
 
 fullscreen = True
 use_playback_delay = False
@@ -23,15 +27,8 @@ def main():
         fps = cap.get(cv2.CAP_PROP_FPS)  # Get the frames per second of the video
         delay = int(1000 / fps)  # Calculate delay for each frame in milliseconds
 
-    # set up audio stream and queue
-    stream = init_audio()
-    frequency_queue = queue.Queue(maxsize=1)
-    threading.Thread(
-        target=audio_processor, args=(stream, frequency_queue), daemon=True
-    ).start()
-
     # set initial values
-    frequency = 100
+    freq = 100
     color = (0, 0, 0)
     playback_speed = 1
 
@@ -39,29 +36,50 @@ def main():
         cv2.namedWindow("Video", cv2.WND_PROP_FULLSCREEN)
         cv2.setWindowProperty("Video", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 
-    while True:
-        # Get new frequency if it exists
-        if not frequency_queue.empty():
-            frequency = frequency_queue.get_nowait()
-            color = freq_to_color(frequency)
-            playback_speed = freq_to_speed(frequency)
+    # distance sensor setup
+    i2c = board.I2C()  # uses board.SCL and board.SDA
+    vl53 = adafruit_vl53l1x.VL53L1X(i2c)
+    vl53.start_ranging()
 
-            print(
-                f"Frequency: {frequency:.1f} Hz, Color: {closest_color(color)}, Speed: {playback_speed:.1f}x"
-            )
+    # Initialize PyAudio
+    p = pyaudio.PyAudio()
+    pa_stream = p.open(format=pyaudio.paFloat32, channels=1, rate=SAMPLE_RATE, output=True)
 
-        # Show video
-        status = display_frame(cap, playback_speed, frame_count, delay)
-        if status == "continue":
-            continue
-        elif status == "break":
-            break
+    # LED setup
+    pb = pixelblaze.Pixelblaze("pb-moot")
+    pb.setActivePattern("Interactive-forwards")
 
-        # Do LED stuff
+    try:
+        while True:
 
-    cap.release()
-    cv2.destroyAllWindows()
+            # FIXME this loop needs to be broken up into individual mqtt driven services
 
+            distance = vl53.distance
+            freq = map_distance_to_frequency(distance)
+
+            # LED stuff
+            pb.setActiveVariables({"t1":freq/1000})
+
+            # audio out
+            waveform = generate_sine_wave(freq, frame_length, SAMPLE_RATE)
+            pa_stream.write(waveform.astype(np.float32).tobytes())
+
+            # video out
+            status = display_frame(cap, playback_speed, frame_count, delay)
+            playback_speed = freq_to_speed(freq)
+
+            # "UI/UX"
+            print(f"Frequency: {freq:.1f} Hz, Speed: {playback_speed:.1f}x")
+            eval(status) #yolo
+
+            # TODO add state machine to drive pattern switcher
+
+    finally:
+        cap.release()
+        cv2.destroyAllWindows()
+        pa_stream.stop_stream()
+        pa_stream.close()
+        p.terminate()
 
 if __name__ == "__main__":
     main()
