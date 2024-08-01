@@ -3,19 +3,29 @@ This repository has the code for the MOOT (Matter Out Of Time), a.k.a. "the time
 
 [MOOT is an interactive art installation built by Glass House Arts for Burning Man 2024](https://www.deldiosglasshouse.com/moot).
 
-The basic steps are:
+## Director
 
-1. Read the audio input stream, which will be a theremin
-2. Estimate the dominant frequency (with moving average)
-3. Map that audio frequency to LED lighting effects (low tone -> red, high tone -> blue)
-4. Use the audio frequency to control video playback (low tone -> backwards in time, hight tone -> fast forward in time)
+The basic steps for `director` are:
 
-## To Do
+1. Read the distance input stream
+2. Use that data to calculate mode, audio frequency, playback speed, and lighting parameters.
+3. Pass relevant data to MQTT
+4. Generate audio output
 
-- add distance sensor as input in addition to audio
-- Control LED strip
+## Video Server
 
-## Install Notes
+`video_server` picks up MQTT video playback parameters and uses them to scrub through video.  It will run as one 
+video per computer, on Raspberry Pi 5s.
+
+## Screen Saver
+
+`screen_saver` is a Rasperry Pi dedicated to running two video streams, totally independent from above. The streams are:
+
+1. Time delay webcam
+2. https://scottdraves.com/bomb
+
+
+# Install Notes
 
 This uses Python 3, and you'll need to install the libraries in requirements.txt.
 
