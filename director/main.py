@@ -36,10 +36,8 @@ def main():
         while True:
             distance = vl53.distance
 
-            mode, freq, amplitude, smoothed_dist = theremin.update(mode, distance)
+            mode, freq, amplitude, smoothed_dist, waveform = theremin.update(mode, distance)
 
-            # audio out
-            waveform = amplitude * np.array(audio.generate_sine_wave(freq))
             pa_stream.write(waveform.astype(np.float32).tobytes())
     finally:
         pa_stream.stop_stream()

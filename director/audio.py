@@ -82,6 +82,10 @@ class Theremin:
         
         This function generates the next_mode, freq, and amplitude
         """
+        previous_amplitude = self.amplitude
+
+        if new_distance is not None and new_distance > params.MAX_DISTANCE: # handle wall reflection case
+            new_distance = None
         
         if new_distance is None:
             self.shutdown_delay_timer += audio_chunk_seconds
@@ -131,7 +135,10 @@ class Theremin:
                 next_mode = "shutdown"
                 
         freq = map_distance_to_frequency(self.distance)
+        # audio out
+        amplitude_ramp = np.linspace(previous_amplitude, self.amplitude, params.CHUNK_LENGTH)
+        waveform = np.multiply(amplitude_ramp,  np.array(generate_sine_wave(freq)))
                 
-        return next_mode, freq, self.amplitude, self.distance
+        return next_mode, freq, self.amplitude, self.distance, waveform
 
 

@@ -3,9 +3,9 @@ SAMPLING_RATE = 44_100 # Hz
 CHUNK_LENGTH = 1024
 
 # Distance parameters
-MIN_DISTANCE = 10 # cm
-MAX_DISTANCE = 1000 # cm
-DISTANCE_ALPHA = 0.9 # Smoothing factor, between 0 and 1. Closer to 1 gives more weight to recent data.
+MIN_DISTANCE = 5 # cm
+MAX_DISTANCE = 800 # cm
+DISTANCE_ALPHA = 0.5 # Smoothing factor, between 0 and 1. Closer to 1 gives more weight to recent data.
 
 # Theremin parameters
 AMPLITUDE_DECAY = 0.01 # per chunk
