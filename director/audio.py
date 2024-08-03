@@ -1,116 +1,137 @@
-import pyaudio
 import numpy as np
-from scipy.signal import find_peaks
-from collections import deque
+import params
+
+def map_distance_to_frequency(distance):
+    # Clamp the distance within the specified bounds
+    clamped_distance = np.clip(distance, params.MIN_DISTANCE, params.MAX_DISTANCE)
+
+    # Map the clamped distance using a logarithmic scale
+    log_scale = np.log(clamped_distance)
+
+    # Normalize the logarithmic value between 0 and 1
+    normalized_log = (log_scale - np.log(params.MIN_DISTANCE)) / (np.log(params.MAX_DISTANCE) - np.log(params.MIN_DISTANCE))
+
+    # Calculate the frequency
+    frequency = params.MAX_FREQ - normalized_log * (params.MAX_FREQ - params.MIN_FREQ)
+
+    return frequency
 
 
-# Set audio stream parameters
-window_size = 5  # Number of past frequencies to consider
-freq_window = deque(maxlen=window_size)
-RATE = 44100  # samples per second
-CHUNK = 4096  # number of samples per frame
-audio_threshold = (
-    1000  # if mean absolute value is less than this, don't estimate frequency
-    # Value was 100, but was gettint too much 60 Hz on generator, so 1,000
-)
-
-
-def audio_processor(stream, frequency_queue):
-    while True:
-        # Read audio stream
-        data = np.frombuffer(
-            stream.read(CHUNK, exception_on_overflow=False), dtype=np.int16
-        )
-        # Find the dominant frequency with smoothing
-        freq = find_freq(data, RATE, CHUNK)
-
-        # make sure the queue is empty before adding new values
-        while not frequency_queue.empty():
-            frequency_queue.get_nowait()
-
-        frequency_queue.put(freq)
-
-
-def init_audio(rate=RATE, chunk=CHUNK):
-    # Initialize PyAudio
-    p = pyaudio.PyAudio()
-
-    # List audio devices and prompt user to pick one
-    list_audio_devices(p)
-    mic_index = int(input("Please enter the index of your microphone: "))
-
-    # Open audio stream
-    stream = p.open(
-        format=pyaudio.paInt16,
-        channels=1,
-        rate=rate,
-        input=True,
-        input_device_index=mic_index,
-        frames_per_buffer=chunk,
-    )
-    return stream
-
-
-def list_audio_devices(p):
-    print("Available audio devices:")
-    for i in range(p.get_device_count()):
-        info = p.get_device_info_by_index(i)
-        print(
-            f"Index: {info['index']}, Name: {info['name']}, Input Channels: {info['maxInputChannels']}, Output Channels: {info['maxOutputChannels']}"
-        )
-
-
-def find_freq(audio_chunk, rate, chunk):
-    if np.mean(np.abs(audio_chunk)) < audio_threshold:
-        return -1
-
-    # Perform FFT
-    fft_data = np.fft.fft(audio_chunk)
-    fft_data = np.abs(
-        fft_data[: len(fft_data) // 2]
-    )  # Take just the real part and normalize
-
-    # Find peaks
-    peaks, _ = find_peaks(fft_data, height=10)
-
-    if peaks.size != 0:
-        # Estimate dominant frequency
-        dominant_freq = np.argmax(fft_data[peaks])  # Index of dominant frequency
-        freq = peaks[dominant_freq] * rate / chunk  # Convert index to frequency
+def smooth_distance(previous_distance, next_distance):
+    # exponential smoothing
+    if next_distance is None:
+        return previous_distance
     else:
-        freq = 118  # Not sure this is right.
+        return params.DISTANCE_ALPHA*next_distance + (1 - params.DISTANCE_ALPHA)*previous_distance
+    
+    
+def update_amplitude(previous_amplitude, next_distance):
+    if next_distance is None:
+        next_amplitude = (1 - params.AMPLITUDE_DECAY) * previous_amplitude
+    else:
+        next_amplitude = (1 + params.AMPLITUDE_ATTACK) * previous_amplitude
+    return np.min([1.0, next_amplitude])
+    
 
-    # Smooth the frequency with a moving average
-    freq_window.append(freq)
-    smoothed_freq = sum(freq_window) / len(freq_window)
-    return smoothed_freq
+def generate_sine_wave(freq):
+    sine_wave = []
+    for ii in range(params.CHUNK_LENGTH):
+        sine_wave.append(pll.generate_next_point(freq))
+    return sine_wave
+    
+
+# this generates one theremin sample at a time, given the previous phase and current frequency
+class PLLSineGenerator:
+    def __init__(self):
+        self.phase = 0
+
+    def generate_next_point(self, freq):
+        # Calculate phase increment
+        phase_increment = 2 * np.pi * freq / params.SAMPLING_RATE
+        
+        # Update phase
+        self.phase += phase_increment
+
+        # Keep the phase within the range of 0 to 2π to avoid overflow
+        self.phase %= 2 * np.pi
+
+        # Generate sine wave
+        return 0.5 * np.sin(self.phase)
 
 
-def freq_to_color(freq):
-    if freq == -1:
-        return (0, 0, 0)  # black
+pll = PLLSineGenerator()
+audio_chunk_seconds = params.CHUNK_LENGTH / params.SAMPLING_RATE
 
-    norm_freq = normalize_frequency(freq)
+class Theremin:
+    def __init__(self):       
+        self.distance = params.MIN_DISTANCE # should never be null
+        
+        # Audio parameters initial values
+        self.amplitude = 1 
+        
+        # State parameters, initial values
+        self.boot_delay_timer = 0 # seconds
+        self.boot_sequence_timer = 0 # seconds
+        self.shutdown_delay_timer = 0 # seconds
+        self.shutdown_sequence_timer = 0 # seconds
 
-    color = (int((1 - norm_freq) * 255), 0, int(norm_freq * 255))
-    return color
+    def update(self, past_mode, new_distance):
+        """
+        past_mode: string, one of "standby", "active", "boot", "shutdown"
+        new_distance: distnace in cm, or None
+        
+        This function generates the next_mode, freq, and amplitude
+        """
+        
+        if new_distance is None:
+            self.shutdown_delay_timer += audio_chunk_seconds
+            self.boot_delay_timer = 0
+        else:
+            self.shutdown_delay_timer = 0
+            self.boot_delay_timer += audio_chunk_seconds
+            
+        self.amplitude = update_amplitude(self.amplitude, new_distance)
+        self.distance = smooth_distance(self.distance, new_distance)
+        
+        if past_mode == "standby":
+            if new_distance is None:
+                Theremin.__init__
+                next_mode = "standby"
+            else:
+                if self.boot_delay_timer > params.BOOT_DELAY_TIME:
+                    # initialize
+                    self.boot_delay_timer = 0
+                    self.boot_sequence_timer = 0 
+                    PLLSineGenerator.__init__
+                    next_mode = "boot"
+                else:
+                    next_mode = "standby"
+        elif past_mode == "boot":
+            self.boot_sequence_timer += audio_chunk_seconds
+            if self.boot_sequence_timer > params.BOOT_SEQUENCE_TIME:
+                next_mode = "active"
+                self.boot_sequence_timer = 0
+            else:
+                next_mode = "boot"
+        elif past_mode == "active":
+            if self.shutdown_delay_timer > params.SHUTDOWN_DELAY_TIME:
+                self.shutdown_delay_timer = 0
+                self.shutdown_sequence_timer = 0
+                next_mode = "shutdown"
+            else:
+                next_mode = "active"
+        elif past_mode == "shutdown":
+            self.shutdown_sequence_timer += audio_chunk_seconds
+            if self.shutdown_sequence_timer > params.SHUTDOWN_SEQUENCE_TIME:
+                next_mode = "standby"
+                Theremin.__init__
+            elif self.boot_delay_timer > params.BOOT_DELAY_TIME:
+                next_mode = "active"
+            else:
+                next_mode = "shutdown"
+                
+        freq = map_distance_to_frequency(self.distance)
+                
+        return next_mode, freq, self.amplitude, self.distance
 
 
-def freq_to_speed(freq):
-    if freq == -1:
-        return 1  # default speed
-
-    norm_freq = normalize_frequency(freq)
-
-    speed = 50 * norm_freq - 20  # This needs some tuning, last 125, -50
-    return speed
-
-
-def normalize_frequency(freq, f_min=100):
-    f_max = f_min * (2**5)  # 5 octaves higher
-    log_f_min = np.log(f_min)
-    log_f_max = np.log(f_max)
-
-    # Map the frequency to a value between 0 and 1 on a log scale
-    norm_freq = np.clip((np.log(freq) - log_f_min) / (log_f_max - log_f_min), 0, 1)
-    return norm_freq

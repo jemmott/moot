@@ -1,7 +1,0 @@
-numpy
-scipy
-opencv-python
-pyaudio
-adafruit-circuitpython-vl53l1x
-pixelblaze-client
-pydub
