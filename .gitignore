@@ -1,6 +1,7 @@
 *.m4v
 *.mov
 *.pyc
+*.mp3
 .direnv
 .venv
 .envrc
