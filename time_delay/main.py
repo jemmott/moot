@@ -1,71 +1,81 @@
 import cv2
-import numpy as np
-from collections import deque
+import queue
+import threading
+import time
 
-# Set the time delay in seconds
-time_delay = 30
 
-# Initialize the video capture with optimized settings
-cap = cv2.VideoCapture(0, cv2.CAP_V4L2)  # Using V4L2 backend
+def frame_capture(video_source, frame_queue, capture_delay):
+    cap = cv2.VideoCapture(video_source)
+    try:
+        while cap.isOpened():
+            ret, frame = cap.read()
+            if not ret:
+                break
+            timestamp = time.time()
+            if frame_queue.full():
+                try:
+                    frame_queue.get_nowait()  # Remove oldest frame if queue is full
+                except queue.Empty:
+                    pass
+            frame_queue.put((timestamp, frame))
+            time.sleep(capture_delay)
+    finally:
+        cap.release()
 
-# Set a lower resolution for better performance
-cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
-cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
-cap.set(cv2.CAP_PROP_FPS, 30)
 
-# Verify if the webcam was opened correctly
-if not cap.isOpened():
-    print("Error: Could not open webcam.")
-    exit()
+def frame_display(frame_queue, display_delay):
+    fullscreen = False
+    cv2.namedWindow("Video", cv2.WINDOW_NORMAL)
 
-# Get the frame rate of the webcam
-fps = cap.get(cv2.CAP_PROP_FPS)
-if fps == 0:
-    fps = 30  # Default FPS if not available
-frame_delay = int(fps * time_delay)
+    while True:
+        key = cv2.waitKey(1) & 0xFF
+        if key == ord("q"):
+            break
+        elif key == ord("f"):
+            fullscreen = not fullscreen
+            cv2.setWindowProperty(
+                "Video",
+                cv2.WND_PROP_FULLSCREEN,
+                cv2.WINDOW_FULLSCREEN if fullscreen else cv2.WINDOW_NORMAL,
+            )
 
-# Get monitor resolution (modify these values to match your monitor's resolution)
-monitor_width = 1920  # Example width for a 1080p monitor
-monitor_height = 1080  # Example height for a 1080p monitor
+        current_time = time.time()
+        target_time = current_time - display_delay
 
-# Create a deque to store frames for the delay
-frame_queue = deque(maxlen=frame_delay)
+        # Remove old frames
+        while not frame_queue.empty():
+            timestamp, _ = frame_queue.queue[0]
+            if timestamp < target_time:
+                try:
+                    frame_queue.get_nowait()
+                except queue.Empty:
+                    break
+            else:
+                break
 
-skip_frames = 2
-frame_count = 0
+        # Display the most relevant frame
+        if not frame_queue.empty():
+            _, frame = frame_queue.get()
+            cv2.imshow("Video", frame)
 
-while True:
-    # Capture frame-by-frame
-    ret, frame = cap.read()
+    cv2.destroyAllWindows()
 
-    if not ret:
-        break
 
-    # Skip frames to reduce load
-    if frame_count % skip_frames == 0:
-        # Resize the frame to fill the monitor
-        resized_frame = cv2.resize(
-            frame, (monitor_width, monitor_height), interpolation=cv2.INTER_LINEAR
-        )
+def main(video_source=0, capture_delay=0.03, display_delay=0.03, max_queue_size=10):
+    frame_queue = queue.Queue(maxsize=max_queue_size)
 
-        # Add the resized frame to the deque
-        frame_queue.append(resized_frame)
+    capture_thread = threading.Thread(
+        target=frame_capture, args=(video_source, frame_queue, capture_delay)
+    )
+    capture_thread.start()
 
-        # If the deque is filled, get the oldest frame for delayed display
-        if len(frame_queue) == frame_delay:
-            delayed_frame = frame_queue.popleft()
-            cv2.imshow("Delayed Video", delayed_frame)
-        else:
-            # Display black frames until the delay period is reached
-            black_frame = np.zeros((monitor_height, monitor_width, 3), dtype=np.uint8)
-            cv2.imshow("Delayed Video", black_frame)
+    try:
+        frame_display(frame_queue, display_delay)
+    except Exception as e:
+        print(f"Error occurred: {e}")
+    finally:
+        capture_thread.join()
 
-    frame_count += 1
 
-    # Break the loop on 'q' key press
-    if cv2.waitKey(1) & 0xFF == ord("q"):
-        break
-
-# Release the webcam and close windows
-cap.release()
-cv2.destroyAllWindows()
+if __name__ == "__main__":
+    main()
