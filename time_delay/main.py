@@ -44,7 +44,9 @@ while True:
     # Skip frames to reduce load
     if frame_count % skip_frames == 0:
         # Resize the frame to fill the monitor
-        resized_frame = cv2.resize(frame, (monitor_width, monitor_height), interpolation=cv2.INTER_LINEAR)
+        resized_frame = cv2.resize(
+            frame, (monitor_width, monitor_height), interpolation=cv2.INTER_LINEAR
+        )
 
         # Add the resized frame to the deque
         frame_queue.append(resized_frame)
@@ -52,16 +54,16 @@ while True:
         # If the deque is filled, get the oldest frame for delayed display
         if len(frame_queue) == frame_delay:
             delayed_frame = frame_queue.popleft()
-            cv2.imshow('Delayed Video', delayed_frame)
+            cv2.imshow("Delayed Video", delayed_frame)
         else:
             # Display black frames until the delay period is reached
             black_frame = np.zeros((monitor_height, monitor_width, 3), dtype=np.uint8)
-            cv2.imshow('Delayed Video', black_frame)
+            cv2.imshow("Delayed Video", black_frame)
 
     frame_count += 1
 
     # Break the loop on 'q' key press
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    if cv2.waitKey(1) & 0xFF == ord("q"):
         break
 
 # Release the webcam and close windows
