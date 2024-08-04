@@ -1,75 +1,61 @@
 import cv2
 import numpy as np
 from collections import deque
+from screeninfo import get_monitors
+
+# Get the screen resolution from the first monitor
+screen_width, screen_height = get_monitors()[0].width, get_monitors()[0].height
 
 # Set the time delay in seconds
-time_delay = 3
+time_delay = 1
 
-# Initialize the video capture with a fallback mechanism
-cap = cv2.VideoCapture(0, cv2.CAP_V4L2)  # Using V4L2 backend
+# Initialize the video capture
+cap = cv2.VideoCapture(0, cv2.CAP_V4L2)
 
-# Fallback to the default backend if V4L2 fails
+# Fallback and error checking
 if not cap.isOpened():
     cap = cv2.VideoCapture(0)
+    if not cap.isOpened():
+        print("Error: Could not open webcam.")
+        exit()
 
-# Verify if the webcam was opened correctly
-if not cap.isOpened():
-    print("Error: Could not open webcam.")
-    exit()
-
-# Get the frame rate of the webcam
-fps = cap.get(cv2.CAP_PROP_FPS)
-if fps == 0:
-    fps = 30  # Default FPS if not available
+# Set frame rate
+fps = cap.get(cv2.CAP_PROP_FPS) or 30
 frame_delay = int(fps * time_delay)
 
-# Create a deque to store frames for the delay
+# Queue for frame storage
 frame_queue = deque(maxlen=frame_delay)
 
-# Variable to track fullscreen state
+# Fullscreen flag
 fullscreen = False
-
-# Create a named window
-cv2.namedWindow("Delayed Video", cv2.WINDOW_GUI_NORMAL)
+cv2.namedWindow('Delayed Video', cv2.WINDOW_NORMAL)
 
 while True:
-    # Capture frame-by-frame
     ret, frame = cap.read()
-
     if not ret:
         print("Error: Failed to read frame from webcam.")
         break
 
-    # Add the frame to the deque
     frame_queue.append(frame)
 
-    # If the deque is filled, get the oldest frame for delayed display
     if len(frame_queue) == frame_delay:
         delayed_frame = frame_queue.popleft()
-        cv2.imshow("Delayed Video", delayed_frame)
     else:
-        # Display black frames until the delay period is reached
-        black_frame = np.zeros(frame.shape, dtype=np.uint8)
-        cv2.imshow("Delayed Video", black_frame)
+        delayed_frame = np.zeros(frame.shape, dtype=np.uint8)
 
+    # Resize frame for fullscreen
+    if fullscreen:
+        delayed_frame = cv2.resize(delayed_frame, (screen_width, screen_height))
+
+    cv2.imshow('Delayed Video', delayed_frame)
     key = cv2.waitKey(1) & 0xFF
 
-    # Break the loop on 'q' key press
-    if key == ord("q"):
+    if key == ord('q'):
         break
-
-    # Toggle fullscreen on 'f' key press
-    if key == ord("f"):
+    if key == ord('f'):
         fullscreen = not fullscreen
-        if fullscreen:
-            cv2.setWindowProperty(
-                "Delayed Video", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN
-            )
-        else:
-            cv2.setWindowProperty(
-                "Delayed Video", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_NORMAL
-            )
+        window_property = cv2.WINDOW_FULLSCREEN if fullscreen else cv2.WINDOW_NORMAL
+        cv2.setWindowProperty('Delayed Video', cv2.WND_PROP_FULLSCREEN, window_property)
 
-# Release the webcam and close windows
 cap.release()
 cv2.destroyAllWindows()
