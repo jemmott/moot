@@ -24,4 +24,3 @@ def get_distance():
 
     # Create a mock sensor
     return MockDistanceSensor(distance_readings)
-
