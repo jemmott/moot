@@ -2,6 +2,10 @@
 *.mov
 *.pyc
 *.mp3
+*.aif
+*.wav
 .direnv
 .venv
 .envrc
+mpd_db
+mpd_pid
