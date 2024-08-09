@@ -1,0 +1,91 @@
+---
+- hosts: audio-driver_server
+  become: yes
+  tasks:
+    - name: Ensure Python and pip are installed
+      apt:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - python3
+        - python3-pip
+
+    - name: Install required Python packages
+      pip:
+        name: 
+          - paho-mqtt
+        executable: pip3
+
+    - name: Create user moot
+      user:
+        name: moot
+        shell: /bin/bash
+        groups: sudo
+        state: present
+        create_home: yes
+
+    - name: Copy SSH authorized_keys
+      copy:
+        src: ~/.ssh/authorized_keys
+        dest: /home/moot/.ssh/authorized_keys
+        owner: moot
+        group: moot
+        mode: '0600'
+
+    - name: Create sudoers file for moot
+      copy:
+        content: |
+          moot ALL=(ALL) NOPASSWD:ALL
+        dest: /etc/sudoers.d/moot
+        owner: root
+        group: root
+        mode: '0440'
+
+    - name: Create directory for the audio-driver script
+      file:
+        path: /home/moot/moot/audio-driver
+        state: directory
+        owner: moot
+        group: moot
+        mode: '0755'
+
+    - name: Copy the audio-driver script to the server
+      copy:
+        src: ./audio_driver.py
+        dest: /home/moot/moot/audio-driver/audio_driver.py
+        owner: moot
+        group: moot
+        mode: '0755'
+
+    - name: Create systemd service file for audio-driver
+      copy:
+        content: |
+          [Unit]
+          Description=Audio Driver MQTT Service
+          After=network.target
+
+          [Service]
+          ExecStart=/usr/bin/python3 /home/moot/moot/audio-driver/audio_driver.py
+          WorkingDirectory=/home/moot/moot/audio-driver
+          StandardOutput=inherit
+          StandardError=inherit
+          Restart=always
+          RestartSec=5
+          User=moot
+          Group=moot
+
+          [Install]
+          WantedBy=multi-user.target
+        dest: /etc/systemd/system/audio_driver.service
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Reload systemd to apply new service
+      command: systemctl daemon-reload
+
+    - name: Enable and start audio_driver service
+      systemd:
+        name: audio_driver
+        enabled: yes
+        state: started
