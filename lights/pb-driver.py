@@ -3,7 +3,7 @@ from pixelblaze import Pixelblaze
 import json
 
 # Pixelblaze setup
-pixelblaze_ip = "192.168.0.103"
+pixelblaze_ip = "192.168.0.104"
 print(f"waiting on pixelblaze at {pixelblaze_ip}")
 pb = Pixelblaze(pixelblaze_ip)
 print("pb connected")
@@ -22,9 +22,9 @@ def on_message(client, userdata, msg):
         print(f"brightness update: {b}")
     if msg.topic == "moot/mode":
         mode = msg.payload.decode()
-        pb.setActiveVariables({"moot_mode": mode})
-        pb.setActivePatternByName("mode")
         print(f"mode update: {mode}")
+        pb.setActiveVariables({"moot_mode": mode})
+        pb.setActivePatternByName(mode)
 
 # MQTT setup
 mqtt_broker = "localhost"
