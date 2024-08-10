@@ -106,6 +106,16 @@ class Theremin:
         self.amplitude = update_amplitude(self.amplitude, new_distance)
         self.distance = smooth_distance(self.distance, new_distance)
 
+        if self.amplitude < params.AMPLITUDE_THRESHOLD:
+            speed = 0
+        else:
+            # Normalize self.distance to a range of 0 to 1
+            normalized_distance = (self.distance - params.MIN_DISTANCE) / (params.MAX_DISTANCE - params.MIN_DISTANCE)
+
+            # Scale normalized_distance to a range of -1 to 1
+            speed = 2 * normalized_distance - 1
+
+
         if past_mode == "standby":
             if new_distance is None:
                 Theremin.__init__
@@ -150,4 +160,4 @@ class Theremin:
         )
         waveform = np.multiply(amplitude_ramp, np.array(generate_sine_wave(freq)))
 
-        return next_mode, freq, self.amplitude, self.distance, waveform
+        return next_mode, freq, self.amplitude, speed, waveform

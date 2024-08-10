@@ -5,3 +5,5 @@ pyaudio
 adafruit-circuitpython-vl53l1x
 pixelblaze-client
 pydub
+paho-mqtt
+adafruit-circuitpython-neopixel

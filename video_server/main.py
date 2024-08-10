@@ -4,12 +4,6 @@ import numpy as np
 
 fullscreen = True
 
-
-# TO DO:
-# below is the main function - need to make this a video playback only loop by removing all the other stuff
-# Goal is to pick up messages from MQTT and use that to control video playback only - no other functionality.
-
-
 def main():
     # Load video
     # cap = cv2.VideoCapture("hats.mov")

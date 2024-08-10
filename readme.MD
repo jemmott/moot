@@ -42,6 +42,14 @@ nano ~/.bashrc
 ```
 Add `source ~/moot/bin/activate` and restart.
 
+### MQTT
+Mac:
+`brew install mosquitto`
+Pi:
+`sudo apt-get install mosquitto mosquitto-clients`
+
+To start: `mosquito`
+
 ### pyaudio
 
 I had trouble using pip to install pyaudio on the mac.  The solution was [here](https://stackoverflow.com/questions/31236194/installing-pyaudio-for-python-3-on-os-x), including having to install the command line tools for Xcode.

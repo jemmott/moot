@@ -6,6 +6,7 @@ import random
 import sys
 import mpd_moot
 
+
 class VLCMQTTController:
     def __init__(self):
         # Paths to the audio files
@@ -15,7 +16,7 @@ class VLCMQTTController:
             "active-03.aif",
             "active-04.aif",
             "active-05.aif",
-            "active-06.aif"
+            "active-06.aif",
         ]
         self.standby_audio_file = "standby.mp3"
         self.startup_audio_file = "startup.aif"
@@ -26,7 +27,13 @@ class VLCMQTTController:
         self.mqtt_topic = "moot/mode"
 
         # VLC command to start in remote control mode
-        self.vlc_standby_command = ["vlc", "--intf", "rc", "--loop", self.standby_audio_file]
+        self.vlc_standby_command = [
+            "vlc",
+            "--intf",
+            "rc",
+            "--loop",
+            self.standby_audio_file,
+        ]
 
         # Initialize variables
         self.vlc_standby_process = None
@@ -58,26 +65,42 @@ class VLCMQTTController:
             self.vlc_standby_command,
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,  # Capture VLC output
-            stderr=sys.stderr   # Redirect VLC error output to main Python stderr
+            stderr=sys.stderr,  # Redirect VLC error output to main Python stderr
         )
         self.set_vlc_volume(self.vlc_standby_process, 256)
-        print(f"Started standby VLC process with PID: {self.vlc_standby_process.pid}", flush=True)
+        print(
+            f"Started standby VLC process with PID: {self.vlc_standby_process.pid}",
+            flush=True,
+        )
 
     def set_vlc_volume(self, vlc_process, volume):
-        print(f"Setting VLC volume to {volume} for process {vlc_process.pid}", flush=True)
+        print(
+            f"Setting VLC volume to {volume} for process {vlc_process.pid}", flush=True
+        )
         vlc_process.stdin.write(f"volume {volume}\n".encode())
         vlc_process.stdin.flush()
         self.volumes[vlc_process.pid] = volume  # Update the local volume state
 
-    def ramp_volume(self, vlc_process, target_volume, duration=1.0, steps=10, terminate=False):
+    def ramp_volume(
+        self, vlc_process, target_volume, duration=1.0, steps=10, terminate=False
+    ):
         current_volume = self.volumes.get(vlc_process.pid, 256)
-        print(f"Current volume for process {vlc_process.pid}: {current_volume}", flush=True)
+        print(
+            f"Current volume for process {vlc_process.pid}: {current_volume}",
+            flush=True,
+        )
 
         if current_volume == target_volume:
-            print(f"Volume for process {vlc_process.pid} is already at {target_volume}, no ramping needed", flush=True)
+            print(
+                f"Volume for process {vlc_process.pid} is already at {target_volume}, no ramping needed",
+                flush=True,
+            )
             return
 
-        print(f"Ramping volume to {target_volume} over {duration} seconds for process {vlc_process.pid}", flush=True)
+        print(
+            f"Ramping volume to {target_volume} over {duration} seconds for process {vlc_process.pid}",
+            flush=True,
+        )
         volume_step = (target_volume - current_volume) / steps
         step_duration = duration / steps
         for step in range(steps):
@@ -86,7 +109,10 @@ class VLCMQTTController:
             time.sleep(step_duration)
 
         if terminate:
-            print(f"Terminating VLC process {vlc_process.pid} after ramping volume", flush=True)
+            print(
+                f"Terminating VLC process {vlc_process.pid} after ramping volume",
+                flush=True,
+            )
             vlc_process.stdin.write("quit\n".encode())
             vlc_process.stdin.flush()
             vlc_process.wait()
@@ -101,10 +127,12 @@ class VLCMQTTController:
             command,
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,  # Capture VLC output
-            stderr=sys.stderr   # Redirect VLC error output to main Python stderr
+            stderr=sys.stderr,  # Redirect VLC error output to main Python stderr
         )
         self.volumes[process.pid] = 256  # Initial volume
-        print(f"Started VLC process for {audio_files} with PID: {process.pid}", flush=True)
+        print(
+            f"Started VLC process for {audio_files} with PID: {process.pid}", flush=True
+        )
         return process
 
     def boot_random_active(self):
@@ -125,16 +153,27 @@ class VLCMQTTController:
             print(f"ignoreing weird mode '{mode}'")
             return
 
-        t = f'{self.current_mode} -> {mode}'
-        if t not in ["standby -> boot", "boot -> standby", "boot -> active", "active -> shutdown", "shutdown -> active", "shutdown -> standby"]:
+        t = f"{self.current_mode} -> {mode}"
+        if t not in [
+            "standby -> boot",
+            "boot -> standby",
+            "boot -> active",
+            "active -> shutdown",
+            "shutdown -> active",
+            "shutdown -> standby",
+        ]:
             print(f"WARNING: illegal transition {t}", flush=True)
         else:
             print(f"Changing modes: {t}", flush=True)
         self.current_mode = mode
 
         if mode == "boot":
-            threading.Thread(target=self.ramp_volume, args=(self.vlc_standby_process, 0)).start()  # Ramp down standby audio to mute
-            threading.Thread(target=self.boot_random_active).start()  # Tell MPD to start playlist
+            threading.Thread(
+                target=self.ramp_volume, args=(self.vlc_standby_process, 0)
+            ).start()  # Ramp down standby audio to mute
+            threading.Thread(
+                target=self.boot_random_active
+            ).start()  # Tell MPD to start playlist
         elif mode == "active":
             # boot -> active transition happens automatically in MPD
             pass
@@ -142,7 +181,9 @@ class VLCMQTTController:
             self.mpd.shutdown_sequence()
         elif mode == "standby":
             # TODO stop mpd? playlist should have terminated automatically
-            threading.Thread(target=self.ramp_volume, args=(self.vlc_standby_process, 256, 5, 50)).start()  # Ramp up standby audio to full volume
+            threading.Thread(
+                target=self.ramp_volume, args=(self.vlc_standby_process, 256, 5, 50)
+            ).start()  # Ramp up standby audio to full volume
 
     def stop_all(self):
         self.mpd.stop()
@@ -151,6 +192,7 @@ class VLCMQTTController:
             self.vlc_standby_process.wait()
         self.client.loop_stop()
         self.client.disconnect()
+
 
 if __name__ == "__main__":
     try:
@@ -161,4 +203,3 @@ if __name__ == "__main__":
         print("Exiting...", flush=True)
     finally:
         controller.stop_all()
-

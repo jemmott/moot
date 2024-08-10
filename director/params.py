@@ -20,3 +20,6 @@ SHUTDOWN_SEQUENCE_TIME = 3  # seconds of startup sequence
 SHUTDOWN_DELAY_TIME = (
     1  # should be more like 30, but testing # seconds of None distance before shutdown
 )
+
+# Speed parameters
+AMPLITUDE_THRESHOLD = 0.2 # below this amplitude the speed is zero

@@ -8,7 +8,7 @@ print(f"waiting on pixelblaze at {pixelblaze_ip}")
 pb = Pixelblaze(pixelblaze_ip)
 print("pb connected")
 
-#pb.setActivePatternByName("standby")
+# pb.setActivePatternByName("standby")
 
 # Define the callback function to handle incoming MQTT messages
 def on_message(client, userdata, msg):
@@ -26,6 +26,7 @@ def on_message(client, userdata, msg):
         pb.setActiveVariables({"moot_mode": mode})
         pb.setActivePatternByName(mode)
 
+
 # MQTT setup
 mqtt_broker = "localhost"
 mqtt_topic = ["moot/speed", "moot/brightness", "moot/mode"]
@@ -39,4 +40,3 @@ client.connect(mqtt_broker, 1883, 60)
 # Start the MQTT client loop
 print("connected to MQTT and PixelBlaze, looping forever")
 client.loop_forever()
-
