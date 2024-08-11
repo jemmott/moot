@@ -27,7 +27,10 @@ def main():
         delay = 1  # play as fast as possible
     else:
         fps = cap.get(cv2.CAP_PROP_FPS)  # Get the frames per second of the video
-        delay = int(1000 / fps)  # Calculate delay for each frame in milliseconds
+        if fps == 0:
+            delay = 33
+        else:
+            delay = int(1000 / fps)  # Calculate delay for each frame in milliseconds
 
     window_name = "Video"
     cv2.namedWindow(window_name, cv2.WND_PROP_FULLSCREEN)
