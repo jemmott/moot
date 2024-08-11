@@ -81,3 +81,7 @@ I tried a version that put opencv in a thread, and it really doesn't like that.
 # Debugging
 
 on director `i2cdetect -y 1` will show connected i2c devices
+
+## Wifi router not getting internet?
+
+`sudo ip r add default via 192.168.0.1 dev wlan0`
