@@ -1,13 +1,13 @@
 import pyaudio
-#import board
-#import adafruit_vl53l1x
+import board
+import adafruit_vl53l1x
 import numpy as np
 import audio
 import params
 import paho.mqtt.client as mqtt
 import testing_distance_mock
 
-sensor_mock = True  # True to run with a mock sensor
+sensor_mock = False  # True to run with a mock sensor
 logging = True
 
 def main():
