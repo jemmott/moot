@@ -76,3 +76,8 @@ If using nixos, make sure the following option is enabled. `hardware.pulseaudio.
 ## Development notes
 
 I tried a version that put opencv in a thread, and it really doesn't like that.
+
+
+# Debugging
+
+on director `i2cdetect -y 1` will show connected i2c devices

@@ -35,7 +35,11 @@ def main():
 
     try:
         while True:
-            distance = vl53.distance
+            try:
+                distance = vl53.distance
+            except Exception as E:
+                distance = None
+                print(f"Ahhhh, snap. Theremin reports {E}")
 
             mode, freq, amplitude, speed, waveform = theremin.update(
                 mode, distance
