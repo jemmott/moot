@@ -131,6 +131,7 @@ class Theremin:
                     next_mode = "standby"
         elif past_mode == "boot":
             self.boot_sequence_timer += audio_chunk_seconds
+            self.amplitude = 1
             if self.boot_sequence_timer > params.BOOT_SEQUENCE_TIME:
                 next_mode = "active"
                 self.boot_sequence_timer = 0
