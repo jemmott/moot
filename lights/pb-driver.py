@@ -22,6 +22,8 @@ def on_message(client, userdata, msg):
         print(f"brightness update: {b}")
     if msg.topic == "moot/mode":
         mode = msg.payload.decode()
+        # if mode == "active":
+        #     mode = "some_other_mode"
         print(f"mode update: {mode}")
         pb.setActiveVariables({"moot_mode": mode})
         pb.setActivePatternByName(mode)

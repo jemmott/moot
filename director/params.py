@@ -4,7 +4,7 @@ CHUNK_LENGTH = 1024
 
 # Distance parameters
 MIN_DISTANCE = 5  # cm
-MAX_DISTANCE = 800  # cm
+MAX_DISTANCE = 80  # cm
 DISTANCE_ALPHA = 0.5  # Smoothing factor, between 0 and 1. Closer to 1 gives more weight to recent data.
 
 # Theremin parameters
