@@ -151,6 +151,7 @@ class Theremin:
                 Theremin.__init__
             elif self.boot_delay_timer > params.BOOT_DELAY_TIME:
                 next_mode = "active"
+                self.amplitude = 1
             else:
                 next_mode = "shutdown"
 

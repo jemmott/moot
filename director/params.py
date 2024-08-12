@@ -1,6 +1,6 @@
 # Audio Parameters
 SAMPLING_RATE = 44_100  # Hz
-CHUNK_LENGTH = 1024
+CHUNK_LENGTH = 1024 # samples
 
 # Distance parameters
 MIN_DISTANCE = 5  # cm
