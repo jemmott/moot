@@ -23,7 +23,7 @@ class VLCMQTTController:
         self.shutdown_audio_file = "shutdown.aif"
 
         # MQTT settings
-        self.mqtt_broker = "localhost"
+        self.mqtt_broker = "192.168.0.103"
         self.mqtt_topic = "moot/mode"
 
         # VLC command to start in remote control mode
