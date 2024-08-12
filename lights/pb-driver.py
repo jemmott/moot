@@ -3,7 +3,7 @@ from pixelblaze import Pixelblaze
 import json
 
 # Pixelblaze setup
-pixelblaze_ip = "192.168.0.104"
+pixelblaze_ip = "192.168.0.108"
 print(f"waiting on pixelblaze at {pixelblaze_ip}")
 pb = Pixelblaze(pixelblaze_ip)
 print("pb connected")

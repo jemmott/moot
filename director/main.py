@@ -8,7 +8,6 @@ import paho.mqtt.client as mqtt
 import testing_distance_mock
 
 sensor_mock = False  # True to run with a mock sensor
-logging = True
 
 def main():
 
@@ -34,7 +33,9 @@ def main():
     mode = "standby"  # start mode
 
     try:
+        loop_count = 0
         while True:
+            loop_count += 1
             try:
                 distance = vl53.distance
             except Exception as E:
@@ -45,13 +46,14 @@ def main():
                 mode, distance
             )
 
-            client.publish("moot/mode", mode)
-            client.publish("moot/speed", freq / params.MAX_FREQ)
+            if loop_count % 10 == 0:
+                loop_count = 0
+                client.publish("moot/mode", mode)
+                client.publish("moot/speed", freq / params.MAX_FREQ)
+                print(f"Time Travel Mode: {mode}, Time Speed: {speed} (seconds per second), frequency {freq} (inverse seconds), theremin loudness {amplitude}")
 
             pa_stream.write(waveform.astype(np.float32).tobytes())
 
-            if logging:
-                print(f"Time Travel Mode: {mode}, Time Speed: {speed} (seconds per second), frequency {freq} (inverse seconds), theremin loudness {amplitude}")
 
     finally:
         pa_stream.stop_stream()
