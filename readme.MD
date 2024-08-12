@@ -89,3 +89,13 @@ on director `i2cdetect -y 1` will show connected i2c devices
 ## mosquitto
 
 `mosquitto_sub -h <BROKER_IP_ADDRESS> -t "test/topic"`
+
+# Computer assignments
+
+## Director
+
+director, mosquitto broker, lights
+
+## Time delay
+
+time delay, ambient audio
