@@ -80,11 +80,9 @@ I tried a version that put opencv in a thread, and it really doesn't like that.
 
 # Debugging
 
+## distance sensor
+
 on director `i2cdetect -y 1` will show connected i2c devices
-
-## Wifi router not getting internet?
-
-`sudo ip r add default via 192.168.0.1 dev wlan0`
 
 ## mosquitto
 
@@ -99,3 +97,11 @@ director, mosquitto broker, lights
 ## Time delay
 
 time delay, ambient audio
+
+# Network Notes
+
+- director: `192.168.0.200`
+- PixelBlaze: `192.168.0.205`
+- moot router: `162.168.0.1` 
+
+Others are dynamic.
