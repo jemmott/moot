@@ -2,7 +2,7 @@ import cv2
 import time
 
 
-def display_frame(cap, playback_speed, frame_count, delay, resize=True):
+def display_frame(cap, playback_speed, frame_count, delay, resize=False):
 
     current_frame = int(cap.get(cv2.CAP_PROP_POS_FRAMES))
 
@@ -26,7 +26,7 @@ def display_frame(cap, playback_speed, frame_count, delay, resize=True):
         frame = trim_widescreen(frame)
 
     # Display the frame
-    cv2.imshow("Video", frame)
+    cv2.imshow("video", frame)
     if cv2.waitKey(delay) & 0xFF == ord("q"):  # Wait based on the video's fps
         return "break"
 

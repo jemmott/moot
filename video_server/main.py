@@ -4,7 +4,7 @@ import paho.mqtt.client as mqtt
 import threading
 from queue import Queue
 
-fullscreen = False
+fullscreen = True
 use_playback_delay = False
 
 cap = cv2.VideoCapture("MOOT.mov")
@@ -19,8 +19,8 @@ else:
     else:
         delay = int(1000 / fps)  # Calculate delay for each frame in milliseconds
 
-window_name = "MOOT VID"
-cv2.namedWindow(window_name, cv2.WND_PROP_FULLSCREEN)
+window_name = "video"
+cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
 
 if fullscreen:
     cv2.setWindowProperty(window_name, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
