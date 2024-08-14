@@ -4,7 +4,7 @@ import paho.mqtt.client as mqtt
 import threading
 from queue import Queue
 
-fullscreen = False
+fullscreen = True
 use_playback_delay = False
 
 cap = cv2.VideoCapture("MOOT.mov")
