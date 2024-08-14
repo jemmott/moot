@@ -48,7 +48,7 @@ def main():
             if loop_count % 10 == 0:
                 loop_count = 0
                 client.publish("moot/mode", mode)
-                client.publish("moot/speed", freq / params.MAX_FREQ)
+                client.publish("moot/speed", speed)
                 print(
                     f"Time Travel Mode: {mode}, Time Speed: {speed} (seconds per second), frequency {freq} (inverse seconds), theremin loudness {amplitude}"
                 )
