@@ -1,6 +1,7 @@
+import json
 import paho.mqtt.client as mqtt
+import threading
 from pixelblaze import Pixelblaze
-import json, threading
 
 # Pixelblaze setup
 pixelblaze_ip = "192.168.0.205"
@@ -13,6 +14,7 @@ print("pb connected")
 l = threading.Lock()
 global cur_mode
 cur_mode = None
+
 
 # Define the callback function to handle incoming MQTT messages
 def on_message(client, userdata, msg):

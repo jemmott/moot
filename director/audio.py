@@ -114,8 +114,8 @@ class Theremin:
                 params.MAX_DISTANCE - params.MIN_DISTANCE
             )
 
-            # Scale normalized_distance to a range of -1 to 1
-            speed = 2 * normalized_distance - 1
+            # Scale normalized_distance to a range of -1 to 1, reversed
+            speed = -2 * normalized_distance + 1
 
         if past_mode == "standby":
             if new_distance is None:

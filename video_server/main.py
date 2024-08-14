@@ -1,63 +1,63 @@
 from video_output import display_frame
 import cv2
-import numpy as np
+import paho.mqtt.client as mqtt
+import threading
+from queue import Queue
 
-# To Do
-# Get MQTT client working
-
-fullscreen = True
+fullscreen = False
 use_playback_delay = False
 
+cap = cv2.VideoCapture("MOOT.mov")
+frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
-def toggle_fullscreen(window_name):
-    global fullscreen
-    fullscreen = not fullscreen
-    if fullscreen:
-        cv2.setWindowProperty(
-            window_name, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN
-        )
+if use_playback_delay:
+    delay = 1  # play as fast as possible
+else:
+    fps = cap.get(cv2.CAP_PROP_FPS)  # Get the frames per second of the video
+    if fps == 0:
+        delay = 33
     else:
-        cv2.setWindowProperty(window_name, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_NORMAL)
+        delay = int(1000 / fps)  # Calculate delay for each frame in milliseconds
+
+window_name = "MOOT VID"
+cv2.namedWindow(window_name, cv2.WND_PROP_FULLSCREEN)
+
+if fullscreen:
+    cv2.setWindowProperty(window_name, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+
+speed_queue = Queue()
+speed = 1
 
 
-def main():
-    # Load video
-    cap = cv2.VideoCapture("MOOT.mov")
-    frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+def mqtt_thread():
+    def on_message(client, userdata, msg):
+        if msg.topic == "moot/speed":
+            new_speed = float(msg.payload.decode())
+            print(f"speed update: {new_speed}")
+            speed_queue.put(new_speed)
 
-    if use_playback_delay:
-        delay = 1  # play as fast as possible
-    else:
-        fps = cap.get(cv2.CAP_PROP_FPS)  # Get the frames per second of the video
-        if fps == 0:
-            delay = 33
-        else:
-            delay = int(1000 / fps)  # Calculate delay for each frame in milliseconds
-
-    window_name = "Video"
-    cv2.namedWindow(window_name, cv2.WND_PROP_FULLSCREEN)
-
-    if fullscreen:
-        cv2.setWindowProperty(
-            window_name, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN
-        )
-
-    try:
-        while True:
-            playback_speed = -10
-            status = display_frame(cap, playback_speed, frame_count, delay)
-
-            # Check for key press
-            key = cv2.waitKey(delay) & 0xFF
-            if key == ord("f"):
-                toggle_fullscreen(window_name)
-            elif key == 27:  # ESC key to break the loop
-                break
-
-    finally:
-        cap.release()
-        cv2.destroyAllWindows()
+    mqtt_broker = "192.168.0.200"
+    client = mqtt.Client()
+    client.on_message = on_message
+    client.connect(mqtt_broker, 1883, 60)
+    client.subscribe("moot/speed")
+    client.loop_forever()
 
 
-if __name__ == "__main__":
-    main()
+# Starting MQTT thread
+threading.Thread(target=mqtt_thread, daemon=True).start()
+
+try:
+    while True:
+        if not speed_queue.empty():
+            speed = speed_queue.get()
+
+        playback_speed = 10 * speed + 1
+        status = display_frame(cap, playback_speed, frame_count, delay)
+
+        key = cv2.waitKey(delay) & 0xFF
+        if key == 27:  # ESC key
+            break
+finally:
+    cap.release()
+    cv2.destroyAllWindows()
