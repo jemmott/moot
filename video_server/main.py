@@ -4,23 +4,27 @@ import paho.mqtt.client as mqtt
 import threading
 from queue import Queue
 
-# Initial settings
-fullscreen = True
+fullscreen = False
 use_playback_delay = False
 
-# Open video file
 cap = cv2.VideoCapture("MOOT.mov")
 frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-fps = cap.get(cv2.CAP_PROP_FPS)
-delay = int(1000 / fps) if fps > 0 else 33
 
-# Window setup
+if use_playback_delay:
+    delay = 1  # play as fast as possible
+else:
+    fps = cap.get(cv2.CAP_PROP_FPS)  # Get the frames per second of the video
+    if fps == 0:
+        delay = 33
+    else:
+        delay = int(1000 / fps)  # Calculate delay for each frame in milliseconds
+
 window_name = "MOOT VID"
-cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)  # Start as normal to set properties
+cv2.namedWindow(window_name, cv2.WND_PROP_FULLSCREEN)
+
 if fullscreen:
     cv2.setWindowProperty(window_name, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 
-# MQTT setup
 speed_queue = Queue()
 speed = 1
 
@@ -38,6 +42,7 @@ def mqtt_thread():
     client.subscribe("moot/speed")
     client.loop_forever()
 
+# Starting MQTT thread
 threading.Thread(target=mqtt_thread, daemon=True).start()
 
 try:
@@ -46,11 +51,8 @@ try:
             speed = speed_queue.get()
 
         playback_speed = 10 * speed + 1
-        ret, frame = cap.read()
-        if not ret:
-            break  # Stop if video is over or fails
+        status = display_frame(cap, playback_speed, frame_count, delay)
 
-        cv2.imshow(window_name, frame)
         key = cv2.waitKey(delay) & 0xFF
         if key == 27:  # ESC key
             break
