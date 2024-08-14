@@ -9,6 +9,7 @@ import testing_distance_mock
 
 sensor_mock = False  # True to run with a mock sensor
 
+
 def main():
 
     # distance sensor setup
@@ -42,18 +43,17 @@ def main():
                 distance = None
                 print(f"Ahhhh, snap. Theremin reports {E}")
 
-            mode, freq, amplitude, speed, waveform = theremin.update(
-                mode, distance
-            )
+            mode, freq, amplitude, speed, waveform = theremin.update(mode, distance)
 
             if loop_count % 10 == 0:
                 loop_count = 0
                 client.publish("moot/mode", mode)
                 client.publish("moot/speed", freq / params.MAX_FREQ)
-                print(f"Time Travel Mode: {mode}, Time Speed: {speed} (seconds per second), frequency {freq} (inverse seconds), theremin loudness {amplitude}")
+                print(
+                    f"Time Travel Mode: {mode}, Time Speed: {speed} (seconds per second), frequency {freq} (inverse seconds), theremin loudness {amplitude}"
+                )
 
             pa_stream.write(waveform.astype(np.float32).tobytes())
-
 
     finally:
         pa_stream.stop_stream()

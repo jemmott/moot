@@ -1,6 +1,6 @@
 # Audio Parameters
 SAMPLING_RATE = 44_100  # Hz
-CHUNK_LENGTH = 1024 # samples
+CHUNK_LENGTH = 1024  # samples
 
 # Distance parameters
 MIN_DISTANCE = 5  # cm
@@ -22,4 +22,4 @@ SHUTDOWN_DELAY_TIME = (
 )
 
 # Speed parameters
-AMPLITUDE_THRESHOLD = 0.2 # below this amplitude the speed is zero
+AMPLITUDE_THRESHOLD = 0.2  # below this amplitude the speed is zero

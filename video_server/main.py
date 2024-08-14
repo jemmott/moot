@@ -13,7 +13,9 @@ def toggle_fullscreen(window_name):
     global fullscreen
     fullscreen = not fullscreen
     if fullscreen:
-        cv2.setWindowProperty(window_name, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+        cv2.setWindowProperty(
+            window_name, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN
+        )
     else:
         cv2.setWindowProperty(window_name, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_NORMAL)
 
@@ -36,7 +38,9 @@ def main():
     cv2.namedWindow(window_name, cv2.WND_PROP_FULLSCREEN)
 
     if fullscreen:
-        cv2.setWindowProperty(window_name, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+        cv2.setWindowProperty(
+            window_name, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN
+        )
 
     try:
         while True:
@@ -45,7 +49,7 @@ def main():
 
             # Check for key press
             key = cv2.waitKey(delay) & 0xFF
-            if key == ord('f'):
+            if key == ord("f"):
                 toggle_fullscreen(window_name)
             elif key == 27:  # ESC key to break the loop
                 break

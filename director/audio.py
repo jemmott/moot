@@ -110,11 +110,12 @@ class Theremin:
             speed = 0
         else:
             # Normalize self.distance to a range of 0 to 1
-            normalized_distance = (self.distance - params.MIN_DISTANCE) / (params.MAX_DISTANCE - params.MIN_DISTANCE)
+            normalized_distance = (self.distance - params.MIN_DISTANCE) / (
+                params.MAX_DISTANCE - params.MIN_DISTANCE
+            )
 
             # Scale normalized_distance to a range of -1 to 1
             speed = 2 * normalized_distance - 1
-
 
         if past_mode == "standby":
             if new_distance is None:
