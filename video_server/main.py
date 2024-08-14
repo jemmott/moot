@@ -52,7 +52,7 @@ try:
         if not speed_queue.empty():
             speed = speed_queue.get()
 
-        playback_speed = 10 * speed + 1
+        playback_speed = 50 * speed + 1
         status = display_frame(cap, playback_speed, frame_count, delay)
 
         key = cv2.waitKey(delay) & 0xFF
