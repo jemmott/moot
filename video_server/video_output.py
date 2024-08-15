@@ -1,10 +1,29 @@
 import cv2
 import time
+import numpy as np
 
 
-def display_frame(cap, playback_speed, frame_count, delay, resize=False):
+def display_frame_core(frame, delay):
+    # Display the frame
+    cv2.imshow("video", frame)
+    if cv2.waitKey(delay) & 0xFF == ord("q"):  # Wait based on the video's fps
+        return "break"
+
+
+def display_frame(cap, playback_speed, frame_count, delay, mode):
+
+    if mode == "hats":  # modified for testing, should be "standby":
+        # Create a black screen
+        frame = np.zeros((int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)),
+                          int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), 3), dtype=np.uint8)
+
+        display_frame_core(frame, delay)
+
+        return "ok"
 
     current_frame = int(cap.get(cv2.CAP_PROP_POS_FRAMES))
+
+    #print(current_frame)
 
     # Calculate new frame position based on playback_speed
     new_frame = current_frame + int(playback_speed)
@@ -22,33 +41,7 @@ def display_frame(cap, playback_speed, frame_count, delay, resize=False):
         cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
         return "continue"
 
-    if resize:  # Trim the frame to widescreen
-        frame = trim_widescreen(frame)
-
-    # Display the frame
-    cv2.imshow("video", frame)
-    if cv2.waitKey(delay) & 0xFF == ord("q"):  # Wait based on the video's fps
-        return "break"
+    display_frame_core(frame, delay)
 
     return "ok"
 
-
-def trim_widescreen(frame):
-    # Get dimensions of the original frame
-    height, width = frame.shape[:2]
-
-    # New dimensions targeting 16:9 aspect ratio
-    new_width = width
-    new_height = int(new_width * 9 / 16)
-
-    # Calculate cropping (assuming black bars are at the top and bottom)
-    start_row = int((height - new_height) / 2)
-    end_row = start_row + new_height
-
-    # Crop the frame to the new dimensions
-    cropped_frame = frame[start_row:end_row, :]
-
-    # Resize to fill the screen if necessary (can adjust the dimensions as needed)
-    resized_frame = cv2.resize(cropped_frame, (new_width, new_height))
-
-    return resized_frame

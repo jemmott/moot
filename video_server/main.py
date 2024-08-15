@@ -9,6 +9,7 @@ use_playback_delay = False
 
 cap = cv2.VideoCapture("MOOT.mov")
 frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+print(frame_count)
 
 if use_playback_delay:
     delay = 1  # play as fast as possible
@@ -28,18 +29,27 @@ if fullscreen:
 speed_queue = Queue()
 speed = 1
 
+mode_queue = Queue()
+mode = "standby"
+
 def mqtt_thread():
     def on_message(client, userdata, msg):
         if msg.topic == "moot/speed":
             new_speed = float(msg.payload.decode())
-            print(f"speed update: {new_speed}")
+            #print(f"speed update: {new_speed}")
             speed_queue.put(new_speed)
+
+        if msg.topic == "moot/mode":
+            new_mode = str(msg.payload.decode())
+            #print(f"mode update: {new_mode}")
+            mode_queue.put(new_mode)
 
     mqtt_broker = "192.168.0.200"
     client = mqtt.Client()
     client.on_message = on_message
     client.connect(mqtt_broker, 1883, 60)
     client.subscribe("moot/speed")
+    client.subscribe("moot/mode")
     client.loop_forever()
 
 # Starting MQTT thread
@@ -50,8 +60,11 @@ try:
         if not speed_queue.empty():
             speed = speed_queue.get()
 
+        if not mode_queue.empty():
+            mode = mode_queue.get()
+
         playback_speed = 10 * speed + 1
-        status = display_frame(cap, playback_speed, frame_count, delay)
+        status = display_frame(cap, playback_speed, frame_count, delay, mode)
 
         key = cv2.waitKey(delay) & 0xFF
         if key == 27:  # ESC key
