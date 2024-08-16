@@ -1,4 +1,4 @@
-from video_output import display_frame
+from video_output import display_frame, display_black
 import cv2
 import paho.mqtt.client as mqtt
 import threading
@@ -63,8 +63,12 @@ try:
         if not mode_queue.empty():
             mode = mode_queue.get()
 
-        playback_speed = 10 * speed + 1
-        status = display_frame(cap, playback_speed, frame_count, delay, mode)
+        if mode == "standby":
+            status = display_black(cap, delay)
+        # add boot and shutdown modes here (load videos, reset frame counts when active / standby, set speed to 1)
+        else:
+            playback_speed = 10 * speed + 1
+            status = display_frame(cap, playback_speed, frame_count, delay, mode)
 
         key = cv2.waitKey(delay) & 0xFF
         if key == 27:  # ESC key

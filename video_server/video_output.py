@@ -12,15 +12,6 @@ def display_frame_core(frame, delay):
 
 def display_frame(cap, playback_speed, frame_count, delay, mode):
 
-    if mode == "hats":  # modified for testing, should be "standby":
-        # Create a black screen
-        frame = np.zeros((int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)),
-                          int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), 3), dtype=np.uint8)
-
-        display_frame_core(frame, delay)
-
-        return "ok"
-
     current_frame = int(cap.get(cv2.CAP_PROP_POS_FRAMES))
 
     #print(current_frame)
@@ -45,3 +36,12 @@ def display_frame(cap, playback_speed, frame_count, delay, mode):
 
     return "ok"
 
+
+def display_black(cap, delay):
+    # Create a black screen
+    frame = np.zeros((int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)),
+                      int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), 3), dtype=np.uint8)
+
+    display_frame_core(frame, delay)
+
+    return "ok"
