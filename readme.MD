@@ -96,7 +96,11 @@ director, mosquitto broker, lights
 
 ## Time delay
 
-time delay, ambient audio
+time delay, 
+
+# Paul A
+
+ambient audio
 
 # Network Notes
 
