@@ -32,16 +32,17 @@ speed = 1
 mode_queue = Queue()
 mode = "standby"
 
+
 def mqtt_thread():
     def on_message(client, userdata, msg):
         if msg.topic == "moot/speed":
             new_speed = float(msg.payload.decode())
-            #print(f"speed update: {new_speed}")
+            # print(f"speed update: {new_speed}")
             speed_queue.put(new_speed)
 
         if msg.topic == "moot/mode":
             new_mode = str(msg.payload.decode())
-            #print(f"mode update: {new_mode}")
+            # print(f"mode update: {new_mode}")
             mode_queue.put(new_mode)
 
     mqtt_broker = "192.168.0.200"
@@ -51,6 +52,7 @@ def mqtt_thread():
     client.subscribe("moot/speed")
     client.subscribe("moot/mode")
     client.loop_forever()
+
 
 # Starting MQTT thread
 threading.Thread(target=mqtt_thread, daemon=True).start()

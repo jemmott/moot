@@ -31,7 +31,7 @@ class VLCMQTTController:
             "vlc",
             "--intf",
             "rc",
-            "--aout", "pulse",  # Use PulseAudio
+            # "--aout", "pulse",  # Use PulseAudio
             "--loop",
             self.standby_audio_file,
         ]

@@ -14,7 +14,7 @@ def display_frame(cap, playback_speed, frame_count, delay, mode):
 
     current_frame = int(cap.get(cv2.CAP_PROP_POS_FRAMES))
 
-    #print(current_frame)
+    # print(current_frame)
 
     # Calculate new frame position based on playback_speed
     new_frame = current_frame + int(playback_speed)
@@ -39,8 +39,14 @@ def display_frame(cap, playback_speed, frame_count, delay, mode):
 
 def display_black(cap, delay):
     # Create a black screen
-    frame = np.zeros((int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)),
-                      int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), 3), dtype=np.uint8)
+    frame = np.zeros(
+        (
+            int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)),
+            int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)),
+            3,
+        ),
+        dtype=np.uint8,
+    )
 
     display_frame_core(frame, delay)
 

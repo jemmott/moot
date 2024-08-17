@@ -14,9 +14,14 @@ l = threading.Lock()
 # Function to draw the frame
 def draw_frame(win):
     rows, cols = win.getmaxyx()
-    win.border('|', '|', '-', '-', '+', '+', '+', '+')
-    win.addstr(0, (cols // 2) - len("MOOT: Matter Out Of Time") // 2, "MOOT: Matter Out Of Time")
+    win.border("|", "|", "-", "-", "+", "+", "+", "+")
+    win.addstr(
+        0,
+        (cols // 2) - len("MOOT: Matter Out Of Time") // 2,
+        "MOOT: Matter Out Of Time",
+    )
     win.refresh()
+
 
 # Function to create the UV meter
 def draw_meter(win, y, x, value, max_value, label):
@@ -25,37 +30,40 @@ def draw_meter(win, y, x, value, max_value, label):
     meter = "[" + "#" * fill + "-" * (width - fill) + "]"
     win.addstr(y, x, f"{label}: {meter}")
 
+
 # Function to create ASCII art text
 def draw_big_text(win, y, x, text):
     big_text = {
-        'S': ["#####", "#    ", "#####", "    #", "#####"],
-        'H': ["#   #", "#   #", "#####", "#   #", "#   #"],
-        'U': ["#   #", "#   #", "#   #", "#   #", "#####"],
-        'T': ["#####", "  #  ", "  #  ", "  #  ", "  #  "],
-        'D': ["#### ", "#   #", "#   #", "#   #", "#### "],
-        'O': ["#####", "#   #", "#   #", "#   #", "#####"],
-        'W': ["#   #", "#   #", "# # #", "## ##", "#   #"],
-        'N': ["#   #", "##  #", "# # #", "#  ##", "#   #"],
-        'A': ["#####", "#   #", "#####", "#   #", "#   #"],
-        'C': ["#####", "#    ", "#    ", "#    ", "#####"],
-        'E': ["#####", "#    ", "#####", "#    ", "#####"],
-        'L': ["#    ", "#    ", "#    ", "#    ", "#####"],
-        'I': [" ### ", "  #  ", "  #  ", "  #  ", " ### "],
-        'V': ["#   #", "#   #", " # # ", " # # ", "  #  "],
-        'R': ["#####", "#   #", "#####", "#  # ", "#   #"],
-        'P': ["#####", "#   #", "#####", "#    ", "#    "],
-        'G': ["#####", "#    ", "# ###", "#   #", "#####"],
-        'B': ["#####", "#   #", "#####", "#   #", "#####"],
-        'Y': ["#   #", " # # ", "  #  ", "  #  ", "  #  "],
+        "S": ["#####", "#    ", "#####", "    #", "#####"],
+        "H": ["#   #", "#   #", "#####", "#   #", "#   #"],
+        "U": ["#   #", "#   #", "#   #", "#   #", "#####"],
+        "T": ["#####", "  #  ", "  #  ", "  #  ", "  #  "],
+        "D": ["#### ", "#   #", "#   #", "#   #", "#### "],
+        "O": ["#####", "#   #", "#   #", "#   #", "#####"],
+        "W": ["#   #", "#   #", "# # #", "## ##", "#   #"],
+        "N": ["#   #", "##  #", "# # #", "#  ##", "#   #"],
+        "A": ["#####", "#   #", "#####", "#   #", "#   #"],
+        "C": ["#####", "#    ", "#    ", "#    ", "#####"],
+        "E": ["#####", "#    ", "#####", "#    ", "#####"],
+        "L": ["#    ", "#    ", "#    ", "#    ", "#####"],
+        "I": [" ### ", "  #  ", "  #  ", "  #  ", " ### "],
+        "V": ["#   #", "#   #", " # # ", " # # ", "  #  "],
+        "R": ["#####", "#   #", "#####", "#  # ", "#   #"],
+        "P": ["#####", "#   #", "#####", "#    ", "#    "],
+        "G": ["#####", "#    ", "# ###", "#   #", "#####"],
+        "B": ["#####", "#   #", "#####", "#   #", "#####"],
+        "Y": ["#   #", " # # ", "  #  ", "  #  ", "  #  "],
     }
 
     for i, line in enumerate(zip(*[big_text[char] for char in text])):
         win.addstr(y + i, x, "  ".join(line))
 
+
 # Function to create a simple waveform display
 def draw_waveform(win, y, x, amplitude, width=40):
-    wave = ''.join(['-' if random.random() > amplitude else ' ' for _ in range(width)])
+    wave = "".join(["-" if random.random() > amplitude else " " for _ in range(width)])
     win.addstr(y, x, wave)
+
 
 # Function to update the display
 def update_display(stdscr):
@@ -80,6 +88,7 @@ def update_display(stdscr):
         stdscr.refresh()
         time.sleep(0.1)
 
+
 # MQTT on_message callback
 def on_message(client, userdata, msg):
     global speed, mode, l
@@ -92,6 +101,7 @@ def on_message(client, userdata, msg):
             mode = msg.payload.decode().upper()
     finally:
         l.release()
+
 
 # Function to start MQTT loop
 def start_mqtt():
@@ -106,6 +116,7 @@ def start_mqtt():
 
     # Start the MQTT client loop in a separate thread
     client.loop_start()
+
 
 if __name__ == "__main__":
     # Start the MQTT loop
