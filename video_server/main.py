@@ -8,8 +8,8 @@ fullscreen = True
 use_playback_delay = False
 
 cap = cv2.VideoCapture("MOOT.mov")
-frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-print(frame_count)
+cap_boot = cv2.VideoCapture("MOOT.mov")  # Change once we have the video
+cap_shutdown = cv2.VideoCapture("MOOT.mov")  # Change once we have the video
 
 if use_playback_delay:
     delay = 1  # play as fast as possible
@@ -58,6 +58,7 @@ def mqtt_thread():
 threading.Thread(target=mqtt_thread, daemon=True).start()
 
 try:
+    previous_mode = "standby"
     while True:
         if not speed_queue.empty():
             speed = speed_queue.get()
@@ -67,10 +68,25 @@ try:
 
         if mode == "standby":
             status = display_black(cap, delay)
+
+        elif mode == "boot":
+            playback_speed = 1
+            if previous_mode != "boot":
+                cap_boot.set(cv2.CAP_PROP_POS_FRAMES, 1)
+            status = display_frame(cap_boot, playback_speed, delay)
+
+        elif mode == "shutdown":
+            playback_speed = 1
+            if previous_mode != "shutdown":
+                cap_shutdown.set(cv2.CAP_PROP_POS_FRAMES, 1)
+            status = display_frame(cap_shutdown, playback_speed, delay)
+
         # add boot and shutdown modes here (load videos, reset frame counts when active / standby, set speed to 1)
         else:
             playback_speed = 10 * speed + 1
-            status = display_frame(cap, playback_speed, frame_count, delay, mode)
+            status = display_frame(cap, playback_speed, delay)
+
+        previous_mode = mode
 
         key = cv2.waitKey(delay) & 0xFF
         if key == 27:  # ESC key

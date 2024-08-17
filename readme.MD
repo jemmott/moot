@@ -86,7 +86,7 @@ on director `i2cdetect -y 1` will show connected i2c devices
 
 ## mosquitto
 
-`mosquitto_sub -h <BROKER_IP_ADDRESS> -t "test/topic"`
+`mosquitto_sub -h 192.168.0.200 -t "moot/speed"`
 
 # Computer assignments
 

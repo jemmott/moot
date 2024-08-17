@@ -10,8 +10,8 @@ def display_frame_core(frame, delay):
         return "break"
 
 
-def display_frame(cap, playback_speed, frame_count, delay, mode):
-
+def display_frame(cap, playback_speed, delay):
+    frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     current_frame = int(cap.get(cv2.CAP_PROP_POS_FRAMES))
 
     # print(current_frame)
