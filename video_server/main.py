@@ -8,8 +8,8 @@ fullscreen = True
 use_playback_delay = False
 
 cap = cv2.VideoCapture("MOOT.mov")
-cap_boot = cv2.VideoCapture("MOOT.mov")  # Change once we have the video
-cap_shutdown = cv2.VideoCapture("MOOT.mov")  # Change once we have the video
+cap_boot = cv2.VideoCapture("MOOT_STARTUP.mov")  # Change once we have the video
+cap_shutdown = cv2.VideoCapture("MOOT_SHUTDOWN.mov")  # Change once we have the video
 
 if use_playback_delay:
     delay = 1  # play as fast as possible
