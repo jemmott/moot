@@ -1,0 +1,18 @@
+##
+# Host Database
+#
+# localhost is used to configure the loopback interface
+# when the system is booting.  Do not change this entry.
+##
+127.0.0.1	localhost
+127.0.0.1	director
+255.255.255.255	broadcasthost
+::1             localhost
+::1             director
+
+192.168.0.200 director
+192.168.0.205 pb-moot
+192.168.0.106 paul-a
+192.168.0.104 paul-b
+192.168.0.101 paul-c
+192.168.0.103 time-delay
