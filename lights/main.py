@@ -1,6 +1,7 @@
 import json
 import paho.mqtt.client as mqtt
 import threading
+import sys
 from pixelblaze import Pixelblaze
 
 # Pixelblaze setup
@@ -49,7 +50,12 @@ mqtt_topic = ["moot/speed", "moot/brightness", "moot/mode"]
 client = mqtt.Client()
 client.on_message = on_message
 
-client.connect(mqtt_broker, 1883, 60)
+while True:
+    try:
+        client.connect(mqtt_broker, 1883, 60)
+        break
+    except:
+        sys.stderr.write("cannot connect to mqtt")
 [client.subscribe(t) for t in mqtt_topic]
 
 # Start the MQTT client loop

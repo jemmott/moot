@@ -3,6 +3,7 @@ import cv2
 import subprocess
 import paho.mqtt.client as mqtt
 import threading
+import sys
 from queue import Queue
 
 fullscreen = True
@@ -52,7 +53,12 @@ def mqtt_thread():
     mqtt_broker = "192.168.0.200"
     client = mqtt.Client()
     client.on_message = on_message
-    client.connect(mqtt_broker, 1883, 60)
+    while True:
+        try:
+            client.connect(mqtt_broker, 1883, 60)
+            break
+        except:
+            sys.stderr.write("cannot connect to mqtt")
     client.subscribe("moot/speed")
     client.subscribe("moot/mode")
     client.loop_forever()

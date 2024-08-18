@@ -60,7 +60,12 @@ class VLCMQTTController:
         self.client = mqtt.Client()
         self.client.on_message = self.on_message
         print(f"Connecting to MQTT broker: {self.mqtt_broker}", flush=True)
-        self.client.connect(self.mqtt_broker, 1883, 60)
+        while True:
+            try:
+                self.client.connect(self.mqtt_broker, 1883, 60)
+                break
+            except:
+                sys.stderr.write("cannot connect to mqtt")
         print(f"Subscribing to MQTT topic: {self.mqtt_topic}", flush=True)
         self.client.subscribe(self.mqtt_topic)
 
