@@ -1,0 +1,1 @@
+parallel-ssh -H paul-a -H paul-b -H paul-c -H director -H time-delay -t 300 -i "$1"

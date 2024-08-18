@@ -167,7 +167,6 @@ class VLCMQTTController:
             print(f"WARNING: illegal transition {t}", flush=True)
         else:
             print(f"Changing modes: {t}", flush=True)
-        self.current_mode = mode
 
         if mode == "boot":
             threading.Thread(
@@ -178,7 +177,10 @@ class VLCMQTTController:
             ).start()  # Tell MPD to start playlist
         elif mode == "active":
             # boot -> active transition happens automatically in MPD
-            pass
+            # but we have to go back one and enable single mode if in shutdown
+            if self.current_mode == "shutdown":
+                self.mpd.send_command("prev")
+                self.mpd.send_command("single on")
         elif mode == "shutdown":
             self.mpd.shutdown_sequence()
         elif mode == "standby":
@@ -186,6 +188,8 @@ class VLCMQTTController:
             threading.Thread(
                 target=self.ramp_volume, args=(self.vlc_standby_process, 256, 5, 50)
             ).start()  # Ramp up standby audio to full volume
+
+        self.current_mode = mode
 
     def stop_all(self):
         self.mpd.stop()
