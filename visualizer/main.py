@@ -3,6 +3,7 @@ import time
 import random
 import paho.mqtt.client as mqtt
 import threading
+import numpy as np
 
 # Global variables to hold the current speed and mode
 speed = 0.5  # From -1 to 1
@@ -61,53 +62,9 @@ def draw_big_text(win, y, x, text):
 
 
 # Function to create a simple waveform display
-def draw_waveform(win, y, x, amplitude, width=40):
+def draw_waveform(win, y, x, amplitude, width=50):
     wave = "".join(["-" if random.random() > amplitude else " " for _ in range(width)])
     win.addstr(y, x, wave, curses.color_pair(1))
-
-
-def draw_matrix_effect(win, rows, cols):
-    bottom_start = rows - (rows // 4)  # Focus on the bottom quarter of the screen
-    matrix_columns = [bottom_start] * cols  # Initialize the start position for each column
-
-    # Keep track of old positions to erase characters
-    old_chars = []
-
-    while True:
-        # Erase old characters
-        for old_y, old_x in old_chars:
-            win.addstr(old_y, old_x, ' ', curses.color_pair(2))
-        old_chars.clear()
-
-        # Update multiple columns per frame for density
-        for _ in range(cols // 2):
-            x = random.randint(0, cols - 1)
-            y = matrix_columns[x]
-
-            # Gradually increase the density as it approaches the bottom
-            if y < bottom_start + (rows // 10):
-                if random.random() > 0.9:  # 50% chance to skip drawing for fading effect
-                    continue
-
-            # Choose a character
-            char = random.choice("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
-
-            # Draw the character within the boundaries (avoiding the frame)
-            if y < rows - 1:
-                win.addstr(y, x, char, curses.color_pair(2))
-                # Save the position to be erased next time
-                old_chars.append((y, x))
-
-            # Update the position for the next frame
-            matrix_columns[x] += 1
-
-            # Reset the column before it reaches the bottom to avoid accumulation
-            if matrix_columns[x] >= rows - 2:  # Stop before the last row to avoid overlap with the frame
-                matrix_columns[x] = bottom_start + random.randint(-2, 2)  # Add some randomness to the reset point
-
-        win.refresh()
-        time.sleep(0.25)
-
 
 
 # Function to update the display
@@ -133,11 +90,8 @@ def update_display(stdscr):
         draw_meter(stdscr, 10, 5, (speed + 1) / 2, 1, "Speed (seconds per second)")
 
         # Draw waveform
-        draw_waveform(stdscr, 14, 5, speed)
-
-        # Draw matrix effect at the bottom
-        rows, cols = stdscr.getmaxyx()
-        draw_matrix_effect(stdscr, rows, cols)
+        for ii in np.arange(14,24):
+            draw_waveform(stdscr, ii, 5, speed)
 
         stdscr.refresh()
         time.sleep(0.1)
