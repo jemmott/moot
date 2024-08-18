@@ -6,7 +6,7 @@ After=graphical.target
 User=moot
 Environment=DISPLAY=:0
 WorkingDirectory=/home/moot/moot/visualizer
-ExecStart=/usr/bin/lxterminal --command="/home/moot/moot/bin/python /home/moot/moot/visualizer/main.py" --fullscreen
+ExecStart=/usr/bin/lxterminal --command="/home/moot/moot/bin/python /home/moot/moot/visualizer/main.py"
 Restart=always
 RestartSec=5
 
