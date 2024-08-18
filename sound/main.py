@@ -49,7 +49,11 @@ class VLCMQTTController:
 
         # MPD for interactive audio
         self.mpd = mpd_moot.MPD()
+
+        # BORN TO -20dB
+        # ALSA IS A FUCK
         os.system("amixer -c 2 sset 'Speaker' 100%")
+        os.system("amixer -c 3 sset 'Speaker' 100%")
 
         # MQTT setup
         self.client = mqtt.Client()
