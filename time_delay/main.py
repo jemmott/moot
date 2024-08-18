@@ -19,7 +19,7 @@ frame_queue = deque(maxlen=frame_delay)
 fullscreen = True
 cv2.namedWindow("Delayed Video", cv2.WINDOW_NORMAL)
 cv2.setWindowProperty("Delayed Video", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
-cv2.setWindowProperty("Delayed Video", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_NORMAL)
+#cv2.setWindowProperty("Delayed Video", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_NORMAL)
 
 # Set the resolution of the monitor
 monitor_resolution = (1920, 1080)  # Change this to your monitor's resolution
