@@ -19,17 +19,16 @@ def draw_frame(win):
         0,
         (cols // 2) - len("MOOT: Matter Out Of Time") // 2,
         "MOOT: Matter Out Of Time",
+        curses.color_pair(1)
     )
     win.refresh()
-
 
 # Function to create the UV meter
 def draw_meter(win, y, x, value, max_value, label):
     width = 20
     fill = int((value / max_value) * width)
     meter = "[" + "#" * fill + "-" * (width - fill) + "]"
-    win.addstr(y, x, f"{label}: {meter}")
-
+    win.addstr(y, x, f"{label}: {meter}", curses.color_pair(1))
 
 # Function to create ASCII art text
 def draw_big_text(win, y, x, text):
@@ -56,20 +55,36 @@ def draw_big_text(win, y, x, text):
     }
 
     for i, line in enumerate(zip(*[big_text[char] for char in text])):
-        win.addstr(y + i, x, "  ".join(line))
-
+        win.addstr(y + i, x, "  ".join(line), curses.color_pair(1))
 
 # Function to create a simple waveform display
 def draw_waveform(win, y, x, amplitude, width=40):
     wave = "".join(["-" if random.random() > amplitude else " " for _ in range(width)])
-    win.addstr(y, x, wave)
+    win.addstr(y, x, wave, curses.color_pair(1))
 
+# Function to create a matrix-like effect focused on the bottom of the screen
+def draw_matrix_effect(win, rows, cols):
+    bottom_start = rows - (rows // 4)  # Start focusing on the bottom quarter of the screen
+    for _ in range(20):  # Control the density of the effect
+        x = random.randint(0, cols - 1)
+        y = random.randint(bottom_start, rows - 2)  # Focus on the bottom part only
+        char = random.choice("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+        win.addstr(y, x, char, curses.color_pair(2))
+        win.refresh()
+        time.sleep(0.05)  # Slow down the appearance
+        win.addstr(y, x, " ")  # Clear the character after a short delay
+        win.refresh()
 
 # Function to update the display
 def update_display(stdscr):
     global speed, mode
     curses.curs_set(0)
     stdscr.clear()
+
+    # Initialize color pairs
+    curses.start_color()
+    curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)
+    curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)
 
     while True:
         stdscr.clear()
@@ -85,9 +100,12 @@ def update_display(stdscr):
         # Draw waveform
         draw_waveform(stdscr, 14, 5, speed)
 
+        # Draw matrix effect at the bottom
+        rows, cols = stdscr.getmaxyx()
+        draw_matrix_effect(stdscr, rows, cols)
+
         stdscr.refresh()
         time.sleep(0.1)
-
 
 # MQTT on_message callback
 def on_message(client, userdata, msg):
@@ -102,7 +120,6 @@ def on_message(client, userdata, msg):
     finally:
         l.release()
 
-
 # Function to start MQTT loop
 def start_mqtt():
     mqtt_broker = "192.168.0.200"
@@ -116,7 +133,6 @@ def start_mqtt():
 
     # Start the MQTT client loop in a separate thread
     client.loop_start()
-
 
 if __name__ == "__main__":
     # Start the MQTT loop
