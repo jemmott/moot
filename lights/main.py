@@ -7,7 +7,12 @@ from pixelblaze import Pixelblaze
 # Pixelblaze setup
 pixelblaze_ip = "192.168.0.205"
 print(f"waiting on pixelblaze at {pixelblaze_ip}")
-pb = Pixelblaze(pixelblaze_ip)
+while True:
+    try:
+        pb = Pixelblaze(pixelblaze_ip)
+        break
+    except:
+        sys.stderr.write("cannot connect to pixelblaze")
 print("pb connected")
 
 # pb.setActivePatternByName("standby")
