@@ -5,6 +5,7 @@ import threading
 import random
 import sys
 import mpd_moot
+import os
 
 
 class VLCMQTTController:
@@ -48,6 +49,7 @@ class VLCMQTTController:
 
         # MPD for interactive audio
         self.mpd = mpd_moot.MPD()
+        os.system("amixer -c 2 sset 'Speaker' 100%")
 
         # MQTT setup
         self.client = mqtt.Client()
