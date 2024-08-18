@@ -7,9 +7,9 @@ from queue import Queue
 fullscreen = True
 use_playback_delay = False
 
-cap = cv2.VideoCapture("MOOT.mov")
-cap_boot = cv2.VideoCapture("MOOT_STARTUP.mov")  # Change once we have the video
-cap_shutdown = cv2.VideoCapture("MOOT_SHUTDOWN.mov")  # Change once we have the video
+cap = cv2.VideoCapture("MOOT_old.mov")
+cap_boot = cv2.VideoCapture("Startup_1.mov")
+cap_shutdown = cv2.VideoCapture("Shutdown_1.mov")
 
 if use_playback_delay:
     delay = 1  # play as fast as possible
