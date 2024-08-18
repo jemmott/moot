@@ -90,7 +90,7 @@ def update_display(stdscr):
         draw_meter(stdscr, 10, 5, (speed + 1) / 2, 1, "Speed (seconds per second)")
 
         # Draw waveform
-        for ii in np.arange(14,24):
+        for ii in np.arange(14, 24):
             draw_waveform(stdscr, ii, 5, speed)
 
         stdscr.refresh()

@@ -1,11 +1,6 @@
 import cv2
 import numpy as np
 from collections import deque
-import pygame
-
-# Initialize pygame and hide the cursor
-pygame.init()
-pygame.mouse.set_visible(False)
 
 # Set the time delay in seconds
 time_delay = 20
@@ -21,7 +16,7 @@ fps = cap.get(cv2.CAP_PROP_FPS) or 30
 frame_delay = int(fps * time_delay)
 frame_queue = deque(maxlen=frame_delay)
 
-fullscreen = False
+fullscreen = True
 cv2.namedWindow("Delayed Video", cv2.WINDOW_NORMAL)
 cv2.setWindowProperty("Delayed Video", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 cv2.setWindowProperty("Delayed Video", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_NORMAL)
@@ -59,6 +54,3 @@ while True:
 
 cap.release()
 cv2.destroyAllWindows()
-
-# Quit pygame
-pygame.quit()

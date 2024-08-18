@@ -33,7 +33,8 @@ class VLCMQTTController:
             "--intf",
             "rc",
             # "--aout", "pulse",  # Use PulseAudio
-            "--aout=alsa", "--alsa-audio-device=hw:3,0",  # Use ALSA
+            "--aout=alsa",
+            "--alsa-audio-device=hw:3,0",  # Use ALSA
             "--loop",
             self.standby_audio_file,
         ]

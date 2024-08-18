@@ -3,11 +3,6 @@ import cv2
 import paho.mqtt.client as mqtt
 import threading
 from queue import Queue
-import pygame
-
-# Initialize pygame and hide the cursor
-pygame.init()
-pygame.mouse.set_visible(False)
 
 fullscreen = True
 use_playback_delay = False
@@ -99,6 +94,3 @@ try:
 finally:
     cap.release()
     cv2.destroyAllWindows()
-
-    # Quit pygame
-    pygame.quit()
