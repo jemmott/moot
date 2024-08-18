@@ -1,0 +1,15 @@
+[Unit]
+Description=Visualizer in Fullscreen LXTerminal
+After=graphical.target
+
+[Service]
+User=moot
+Environment=DISPLAY=:0
+WorkingDirectory=/home/moot/moot/visualizer
+ExecStart=/usr/bin/lxterminal --command="/home/moot/moot/venv/bin/python /home/moot/moot/visualizer/main.py" --fullscreen
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=graphical.target
+
