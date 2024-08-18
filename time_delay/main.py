@@ -1,4 +1,5 @@
 import cv2
+import subprocess
 import numpy as np
 from collections import deque
 
@@ -7,6 +8,9 @@ time_delay = 20
 
 # Initialize the video capture
 cap = cv2.VideoCapture(0)
+
+#housekeeping
+subprocess.Popen(["unclutter", "-idle", "1.0"])
 
 if not cap.isOpened():
     print("Error: Could not open webcam.")
