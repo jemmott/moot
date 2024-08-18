@@ -1,0 +1,15 @@
+[Unit]
+Description=Lights Controller
+After=graphical.target
+
+[Service]
+User=moot
+Environment=DISPLAY=:0
+WorkingDirectory=/home/moot/moot/lights
+ExecStart=/home/moot/moot/bin/python /home/moot/moot/lights/main.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=graphical.target
+

@@ -1,0 +1,19 @@
+[Unit]
+Description=Video Server
+After=graphical.target
+
+[Service]
+User=moot
+Environment=DISPLAY=:0
+WorkingDirectory=/home/moot/moot/video_server
+ExecStart=/home/moot/moot/bin/python /home/moot/moot/video_server/main.py
+Restart=always
+RestartSec=5
+
+# Custom stop command to send SIGINT
+KillSignal=SIGINT
+TimeoutStopSec=20
+
+[Install]
+WantedBy=graphical.target
+

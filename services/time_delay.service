@@ -1,0 +1,15 @@
+[Unit]
+Description=Time Delay Controller
+After=graphical.target
+
+[Service]
+User=moot
+Environment=DISPLAY=:0
+WorkingDirectory=/home/moot/moot/time_delay
+ExecStart=/home/moot/moot/bin/python /home/moot/moot/time_delay/main.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=graphical.target
+
