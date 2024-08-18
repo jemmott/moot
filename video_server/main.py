@@ -26,7 +26,7 @@ else:
         delay = int(1000 / fps)  # Calculate delay for each frame in milliseconds
 
 # PAUL HAXX
-delay = 41
+delay = 4
 
 window_name = "video"
 cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
