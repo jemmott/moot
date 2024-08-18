@@ -1,6 +1,11 @@
 import cv2
 import numpy as np
 from collections import deque
+import pygame
+
+# Initialize pygame and hide the cursor
+pygame.init()
+pygame.mouse.set_visible(False)
 
 # Set the time delay in seconds
 time_delay = 20
@@ -54,3 +59,6 @@ while True:
 
 cap.release()
 cv2.destroyAllWindows()
+
+# Quit pygame
+pygame.quit()
