@@ -13,7 +13,7 @@ cap_boot = cv2.VideoCapture("Startup_1.mov")
 cap_shutdown = cv2.VideoCapture("Shutdown_1.mov")
 
 #housekeeping
-subprocess.Popen("unclutter", "-idle", "1.0"]
+subprocess.Popen(["unclutter", "-idle", "1.0"])
 
 if use_playback_delay:
     delay = 1  # play as fast as possible
